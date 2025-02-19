@@ -1,0 +1,19 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .navbar__logo h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+  .navbar__actions {
+    display: flex;
+    align-items: center;
+  }
+  

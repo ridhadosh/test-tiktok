@@ -1,0 +1,19 @@
+.video-feed {
+    /* Occupe toute la fenêtre en hauteur */
+    height: 100vh;
+    /* Active le scroll vertical */
+    overflow-y: scroll;
+    /* Active le "snap" vertical obligatoire */
+    scroll-snap-type: y mandatory;
+    /* Optionnel : pour avoir un défilement fluide */
+    scroll-behavior: smooth;
+
+     /* Masquer la scrollbar (WebKit) */
+    -ms-overflow-style: none;  /* IE/Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+
+.video-feed::-webkit-scrollbar {
+display: none; /* Chrome/Safari/WebKit */
+}
+  

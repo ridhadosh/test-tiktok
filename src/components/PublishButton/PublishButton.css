@@ -1,0 +1,14 @@
+.publish-button {
+    background-color: #fe2c55; /* Couleur TikTok-ish */
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .publish-button:hover {
+    opacity: 0.9;
+  }
+  
