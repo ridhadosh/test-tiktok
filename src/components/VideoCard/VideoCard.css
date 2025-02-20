@@ -14,23 +14,27 @@
 /* Internal container for video and icons */
 .video-wrapper {
   position: relative;
-  width: 60%;           /* 60% of the viewport width */
-  max-width: 700px;     /* Won't grow beyond 720px on larger screens */
-  height: 85vh;
-  max-height: 85vh;
+  width: 100%;
+  max-width: 720px;
+  height: 90vh;      /* Keeps it large but not full screen */
+  max-height: 90vh;  
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   top: 8%;
 }
 
 /* Video element */
 .video-card__player {
-  width: 90%;          /* Fills the video-wrapper */
+  width: 85%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;  /* Ensures the full video is visible without cropping */
   border-radius: 16px;
-  background-color: #fff;
+  background-color: #000; /* Black background for empty spaces */
   cursor: pointer;
 }
+
 
 /* Action icons (fixed size buttons) */
 .video-card__actions {
