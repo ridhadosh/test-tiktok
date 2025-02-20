@@ -1,11 +1,17 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Ensures it stays on top of other elements */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
   
   .navbar__logo h1 {
     font-size: 1.5rem;

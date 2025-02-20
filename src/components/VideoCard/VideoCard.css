@@ -1,4 +1,4 @@
-/* Conteneur principal pour chaque "carte" vidéo */
+/* Main container for each video card */
 .video-card {
   display: flex;
   justify-content: center;
@@ -11,17 +11,20 @@
   scroll-snap-align: start;
 }
 
-/* Conteneur interne pour la vidéo + icônes */
+/* Internal container for video and icons */
 .video-wrapper {
   position: relative;
-  width: 700px;
+  width: 720px;      /* Fixed for larger screens */
+  max-width: 100%;   /* But not wider than the viewport */
   height: 100%;
+  top: 8%;
   overflow: hidden;
 }
 
-/* La vidéo en elle-même */
+/* Video element */
 .video-card__player {
-  width: 650px; 
+  width: 640px;      /* Fixed for larger screens */
+  max-width: 100%;   /* Scales down on small devices */
   height: 100%;
   object-fit: cover;
   border-radius: 16px;
@@ -29,32 +32,29 @@
   cursor: pointer;
 }
 
-/* Les icônes d’action (like, comment, share, cart) */
+/* Action icons */
 .video-card__actions {
   position: absolute;
-  left: 95%;
-  bottom: 5%;
+  right: 1%;
+  bottom: 2%;
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-/* Style de chaque icône */
+/* Icon styling and hover animation */
 .action-btn {
-  font-size: 30px;
-  color: #000000;
+  font-size: 45px;
+  color: #000;
   cursor: pointer;
-  /* On garde une transition sur la couleur, si tu veux un passage en douceur */
   transition: color 0.2s;
 }
 
-/* Au survol : on change la couleur et on déclenche une animation "bounce" */
 .action-btn:hover {
   color: #fe2c55;
   animation: bounce 0.5s ease;
 }
 
-/* Définition de l'animation "bounce" */
 @keyframes bounce {
   0% {
     transform: scale(1) translateY(0);
@@ -67,5 +67,15 @@
   }
   100% {
     transform: scale(1) translateY(0);
+  }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .video-wrapper {
+    width: 100%;     /* Use full width of the device */
+  }
+  .video-card__player {
+    width: 100%;     /* Video fills the wrapper */
   }
 }

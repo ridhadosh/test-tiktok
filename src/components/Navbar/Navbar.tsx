@@ -7,7 +7,7 @@ const Navbar: React.FC = () => {
     <nav className="navbar">
       <div className="navbar__logo">
         {/* Logo / Titre de l'application */}
-        <h1>Carrousel</h1>
+        <h1>kotkit</h1>
       </div>
       <div className="navbar__actions">
         {/* Bouton pour publier une nouvelle vidéo */}
