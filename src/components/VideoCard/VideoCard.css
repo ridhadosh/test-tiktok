@@ -31,7 +31,7 @@
   height: 100%;
   object-fit: contain;  /* Ensures the full video is visible without cropping */
   border-radius: 16px;
-  background-color: #000; /* Black background for empty spaces */
+  background-color: #000000; /* Black background for empty spaces */
   cursor: pointer;
 }
 
@@ -39,24 +39,60 @@
 /* Action icons (fixed size buttons) */
 .video-card__actions {
   position: absolute;
-  right: 1%;
+  right: 0.5%;
   bottom: 2%;
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-/* Icon styling and hover animation (fixed size) */
+.action-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Style des icônes */
 .action-btn {
-  font-size: 45px;      /* Fixed size */
+  font-size: 45px;
   color: #000;
   cursor: pointer;
   transition: color 0.2s;
 }
 
-.action-btn:hover {
+
+
+/* Effet quand un bouton est liké */
+.liked {
   color: #fe2c55;
+  transform: scale(1.1);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* Changement de couleur au hover si déjà liké */
+.liked:hover {
+  color: #c91540;  /* Une teinte plus foncée pour l’effet */
+}
+
+/* Style du compteur (texte sous l’icône) */
+.counter {
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.action-btn:hover {
   animation: bounce 0.5s ease;
+}
+
+/* Style du compteur (texte sous l’icône) */
+.counter {
+  font-size: 16px;
+  color: #333;
+  font-weight: bold;
+  margin-top: 5px;
 }
 
 .video-status-icon {
@@ -69,6 +105,86 @@
   opacity: 0.8;
   pointer-events: none;
 }
+
+/* MODAL BACKDROP */
+.comment-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 1000;
+  bottom: 2%;
+}
+
+/* COMMENT CONTAINER */
+.comment-container {
+  width: 100%;
+  max-width: 500px;
+  height: 50%;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+
+/* COMMENT HEADER */
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.comment-header h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* COMMENT LIST */
+.comment-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+/* COMMENT INPUT */
+.comment-input {
+  display: flex;
+  border-top: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.comment-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.comment-input button {
+  background: #fe2c55;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
 
 @keyframes bounce {
   0% {
