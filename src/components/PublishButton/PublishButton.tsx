@@ -38,11 +38,11 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       const data = await response.json();
       console.log('Upload success:', data);
 
-      // On ferme la modale et on clear le fichier
+      // Fermer la modale et vider le fichier
       setShowModal(false);
       setSelectedFile(null);
 
-      // 1) Appeler le callback pour que le parent rafraîchisse le carrousel
+      // Appeler le callback pour rafraîchir la liste
       onUploadSuccess();
     } catch (error) {
       console.error(error);
@@ -58,15 +58,36 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-card">
             <h2>Publier une vidéo</h2>
-            <input
-              type="file"
-              accept="video/*"
-              onChange={handleFileChange}
-            />
-            <button onClick={handleUpload}>Upload</button>
-            <button onClick={() => setShowModal(false)}>Annuler</button>
+
+            {/* Wrapper pour le "Choose File" + nom du fichier */}
+            <div className="file-input-wrapper">
+              <label htmlFor="videoFile" className="choose-file-btn">
+                Choisir un fichier
+              </label>
+              <input
+                id="videoFile"
+                type="file"
+                accept="video/*"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+              {/* Si un fichier est sélectionné, on affiche son nom */}
+              {selectedFile && (
+                <span className="file-name">{selectedFile.name}</span>
+              )}
+            </div>
+
+            {/* Boutons Upload et Annuler */}
+            <div className="button-row">
+              <button className="upload-btn" onClick={handleUpload}>
+                Upload
+              </button>
+              <button className="cancel-btn" onClick={() => setShowModal(false)}>
+                Annuler
+              </button>
+            </div>
           </div>
         </div>
       )}
