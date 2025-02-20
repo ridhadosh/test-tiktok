@@ -10,23 +10,27 @@ interface VideoCardProps {
 const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  // Cet état déterminera l’icône à afficher : 'play', 'pause' ou rien
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
-  // --- 1) GESTION DU CLIC ---
+  // États pour les compteurs
+  const [likes, setLikes] = useState(234);
+  const [comments, setComments] = useState(57);
+  const [shares, setShares] = useState(12);
+  const [cartAdds, setCartAdds] = useState(8);
+
+  // État pour savoir si l’utilisateur a liké
+  const [isLiked, setIsLiked] = useState(false);
+
+  // État pour gérer l'ouverture du modal de commentaires
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+
   const handleVideoPress = () => {
     if (!videoRef.current) return;
-
-    // Pause toutes les autres vidéos
     const allVideos = document.querySelectorAll('video');
     allVideos.forEach((vid) => {
-      if (vid !== videoRef.current) {
-        vid.pause();
-      }
+      if (vid !== videoRef.current) vid.pause();
     });
 
-    // Lecture / Pause de la vidéo courante
     if (isPlaying) {
       videoRef.current.pause();
       setShowControlIcon('pause');
@@ -36,13 +40,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
     setIsPlaying(!isPlaying);
 
-    // Faire disparaître l’icône après 1 seconde
     setTimeout(() => {
       setShowControlIcon(null);
     }, 700);
   };
 
-  // --- 2) OBSERVER SI LA VIDÉO EST VISIBLE (SCROLL / SWIPE) ---
   useEffect(() => {
     if (!videoRef.current) return;
 
@@ -60,17 +62,27 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           setIsPlaying(false);
         }
       },
-      {
-        threshold: 0.7, // 70% visible pour être considéré "en vue"
-      }
+      { threshold: 0.7 }
     );
 
-    // Observe la balise vidéo
     observer.observe(videoRef.current);
-
   }, []);
 
-  // --- 3) RENDU ---
+  // Fonction pour gérer le like/unlike
+  const toggleLike = () => {
+    if (isLiked) {
+      setLikes(likes - 1);
+    } else {
+      setLikes(likes + 1);
+    }
+    setIsLiked(!isLiked);
+  };
+
+  // Fonction pour ouvrir et fermer le modal de commentaires
+  const toggleComments = () => {
+    setIsCommentOpen(!isCommentOpen);
+  };
+
   return (
     <div className="video-card">
       <div className="video-wrapper">
@@ -81,8 +93,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           loop
           onClick={handleVideoPress}
         />
-        
-        {/* Icône Play/Pause en overlay, s’affiche si showControlIcon n’est pas null */}
+
         {showControlIcon && (
           <div className="video-status-icon">
             {showControlIcon === 'play' ? (
@@ -94,20 +105,43 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         )}
 
         <div className="video-card__actions">
-          <div className="action-btn" onClick={() => console.log('Like')}>
-            <i className="fa fa-heart"></i>
+          <div className="action-container" onClick={toggleLike}>
+            <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
+            <span className="counter">{likes}</span>
           </div>
-          <div className="action-btn" onClick={() => console.log('Comment')}>
-            <i className="fa fa-comment"></i>
+          <div className="action-container" onClick={toggleComments}>
+            <i className="fa fa-comment action-btn"></i>
+            <span className="counter">{comments}</span>
           </div>
-          <div className="action-btn" onClick={() => console.log('Share')}>
-            <i className="fa fa-share"></i>
+          <div className="action-container" onClick={() => setShares(shares + 1)}>
+            <i className="fa fa-share action-btn"></i>
+            <span className="counter">{shares}</span>
           </div>
-          <div className="action-btn" onClick={() => console.log('Cart')}>
-            <i className="fa fa-shopping-cart"></i>
+          <div className="action-container" onClick={() => setCartAdds(cartAdds + 1)}>
+            <i className="fa fa-shopping-cart action-btn"></i>
+            <span className="counter">{cartAdds}</span>
           </div>
         </div>
       </div>
+
+      {/* COMMENT MODAL */}
+      {isCommentOpen && (
+        <div className="comment-modal" onClick={toggleComments}>
+          <div className="comment-container" onClick={(e) => e.stopPropagation()}>
+            <div className="comment-header">
+              <h2>Comments</h2>
+              <button className="close-btn" onClick={toggleComments}>✕</button>
+            </div>
+            <div className="comment-list">
+              <p>🚀 No comments yet. Be the first!</p>
+            </div>
+            <div className="comment-input">
+              <input type="text" placeholder="Write a comment..." />
+              <button>Send</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
