@@ -16,6 +16,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Cet état déterminera l’icône à afficher : 'play', 'pause' ou rien
+  const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
+
   // --- 1) GESTION DU CLIC ---
   const handleVideoPress = () => {
     if (!videoRef.current) return;
@@ -31,10 +34,17 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     // Lecture / Pause de la vidéo courante
     if (isPlaying) {
       videoRef.current.pause();
+      setShowControlIcon('pause');
     } else {
       videoRef.current.play();
+      setShowControlIcon('play');
     }
     setIsPlaying(!isPlaying);
+
+    // Faire disparaître l’icône après 1 seconde
+    setTimeout(() => {
+      setShowControlIcon(null);
+    }, 1000);
   };
 
   // --- 2) OBSERVER SI LA VIDÉO EST VISIBLE (SCROLL / SWIPE) ---
@@ -53,7 +63,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             videoRef.current.currentTime = 0;
           }
           setIsPlaying(false);
-        }        
+        }
       },
       {
         threshold: 0.7, // 70% visible pour être considéré "en vue"
@@ -82,6 +92,18 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           loop
           onClick={handleVideoPress}
         />
+        
+        {/* Icône Play/Pause en overlay, s’affiche si showControlIcon n’est pas null */}
+        {showControlIcon && (
+          <div className="video-status-icon">
+            {showControlIcon === 'play' ? (
+              <i className="fa fa-play" />
+            ) : (
+              <i className="fa fa-pause" />
+            )}
+          </div>
+        )}
+
         <div className="video-card__actions">
           <div className="action-btn" onClick={() => console.log('Like')}>
             <i className="fa fa-heart"></i>

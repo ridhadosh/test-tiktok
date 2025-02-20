@@ -55,6 +55,23 @@
   animation: bounce 0.5s ease;
 }
 
+.video-status-icon {
+  /* On le place au centre absolu */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  
+  /* On augmente la taille et la couleur de l'icône */
+  font-size: 60px;
+  color: #fff;
+  opacity: 0.8;
+  
+  /* Empêche de cliquer dessus, c’est juste un indicateur visuel */
+  pointer-events: none;
+}
+
+
 @keyframes bounce {
   0% {
     transform: scale(1) translateY(0);
