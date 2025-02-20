@@ -73,12 +73,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     // Observe la balise vidéo
     observer.observe(videoRef.current);
 
-    // Nettoyage : on arrête d'observer quand le composant se démonte
-    return () => {
-      if (videoRef.current) {
-        observer.unobserve(videoRef.current);
-      }
-    };
   }, []);
 
   // --- 3) RENDU ---

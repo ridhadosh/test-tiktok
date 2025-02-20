@@ -14,17 +14,17 @@
 /* Internal container for video and icons */
 .video-wrapper {
   position: relative;
-  width: 720px;      /* Fixed for larger screens */
-  max-width: 100%;   /* But not wider than the viewport */
+  width: 60%;           /* 60% of the viewport width */
+  max-width: 700px;     /* Won't grow beyond 720px on larger screens */
   height: 100%;
-  top: 8%;
+  max-height: 85vh;
   overflow: hidden;
+  top: 8%;
 }
 
 /* Video element */
 .video-card__player {
-  width: 640px;      /* Fixed for larger screens */
-  max-width: 100%;   /* Scales down on small devices */
+  width: 90%;          /* Fills the video-wrapper */
   height: 100%;
   object-fit: cover;
   border-radius: 16px;
@@ -32,7 +32,7 @@
   cursor: pointer;
 }
 
-/* Action icons */
+/* Action icons (fixed size buttons) */
 .video-card__actions {
   position: absolute;
   right: 1%;
@@ -42,9 +42,9 @@
   gap: 2rem;
 }
 
-/* Icon styling and hover animation */
+/* Icon styling and hover animation (fixed size) */
 .action-btn {
-  font-size: 45px;
+  font-size: 45px;      /* Fixed size */
   color: #000;
   cursor: pointer;
   transition: color 0.2s;
@@ -56,21 +56,15 @@
 }
 
 .video-status-icon {
-  /* On le place au centre absolu */
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 45%;
   transform: translate(-50%, -50%);
-  
-  /* On augmente la taille et la couleur de l'icône */
   font-size: 60px;
   color: #fff;
   opacity: 0.8;
-  
-  /* Empêche de cliquer dessus, c’est juste un indicateur visuel */
   pointer-events: none;
 }
-
 
 @keyframes bounce {
   0% {
@@ -87,12 +81,9 @@
   }
 }
 
-/* Media query for smaller screens */
+/* For smaller screens, let the wrapper take full width */
 @media (max-width: 768px) {
   .video-wrapper {
-    width: 100%;     /* Use full width of the device */
-  }
-  .video-card__player {
-    width: 100%;     /* Video fills the wrapper */
+    width: 100%;
   }
 }
