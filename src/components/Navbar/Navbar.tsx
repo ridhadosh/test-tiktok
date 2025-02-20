@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
       </div>
       <div className="navbar__actions">
         {/* Bouton pour publier une nouvelle vidéo */}
-        <PublishButton />
+        <PublishButton onUploadSuccess={() => {}}  />
       </div>
     </nav>
   );

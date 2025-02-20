@@ -1,12 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './VideoCard.css';
+import { VideoData } from '../../types';
 
-interface VideoData {
-  id: number;
-  src: string;
-  title: string;
-  productLink?: string;
-}
 
 interface VideoCardProps {
   video: VideoData;
@@ -44,7 +39,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     // Faire disparaître l’icône après 1 seconde
     setTimeout(() => {
       setShowControlIcon(null);
-    }, 1000);
+    }, 700);
   };
 
   // --- 2) OBSERVER SI LA VIDÉO EST VISIBLE (SCROLL / SWIPE) ---

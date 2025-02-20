@@ -1,38 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import VideoCard from '../VideoCard/VideoCard';
 import '../VideoFeed/VideoFeed.css';
+import { VideoData } from '../../types';
 
-interface VideoData {
-  id: number;
-  src: string;
-  title: string;
-  productLink?: string;
-}
-
-const mockVideos: VideoData[] = [
-  {
-    id: 1,
-    src: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    title: 'Première vidéo',
-    productLink: 'https://mon-site.com/produit-1',
-  },
-  {
-    id: 2,
-    src: 'https://www.w3schools.com/html/movie.mp4',
-    title: 'Deuxième vidéo',
-    productLink: 'https://mon-site.com/produit-2',
-  },
-  // Ajoute plus de vidéos...
-];
 
 const VideoFeed: React.FC = () => {
+  // On stocke la liste des vidéos dans un state
+  const [videos, setVideos] = useState<VideoData[]>([]);
+
+  // Fonction pour récupérer la liste des vidéos depuis le back-end
+  const fetchVideos = async () => {
+    try {
+      // Remplace l’URL par ton adresse (avec ou sans proxy)
+      const response = await fetch('http://localhost:3001/videos');
+      if (!response.ok) {
+        throw new Error('Failed to fetch videos');
+      }
+      const data = await response.json();
+      setVideos(data);
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+    }
+  };
+
+  // Appel au montage du composant pour charger les vidéos
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  // Callback pour rafraîchir la liste après upload (si on place PublishButton ici)
+  const handleUploadSuccess = () => {
+    fetchVideos();
+  };
+
   return (
     <div className="video-feed">
-      {mockVideos.map((video) => (
+      {/* 
+        Optionnel : si tu veux le bouton ici, tu l’ajoutes
+        <PublishButton onUploadSuccess={handleUploadSuccess} />
+      */}
+      {videos.map((video) => (
         <VideoCard key={video.id} video={video} />
       ))}
     </div>
   );
-}
+};
 
 export default VideoFeed;
