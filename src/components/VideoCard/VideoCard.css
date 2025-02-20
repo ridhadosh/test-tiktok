@@ -14,15 +14,15 @@
 /* Conteneur interne pour la vidéo + icônes */
 .video-wrapper {
   position: relative;
-  width: 570px;
-  height: 730px;
+  width: 700px;
+  height: 100%;
   overflow: hidden;
 }
 
 /* La vidéo en elle-même */
 .video-card__player {
-  width: 500px; 
-  height: 730px;
+  width: 650px; 
+  height: 100%;
   object-fit: cover;
   border-radius: 16px;
   background-color: #fff;
@@ -32,7 +32,7 @@
 /* Les icônes d’action (like, comment, share, cart) */
 .video-card__actions {
   position: absolute;
-  right: 20px;
+  left: 95%;
   bottom: 5%;
   display: flex;
   flex-direction: column;
