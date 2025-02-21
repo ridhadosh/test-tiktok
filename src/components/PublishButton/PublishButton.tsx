@@ -24,26 +24,29 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       alert('Please select a video file first!');
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('video', selectedFile);
-
+  
     try {
       const response = await fetch('http://localhost:3001/upload', {
         method: 'POST',
         body: formData,
       });
       if (!response.ok) throw new Error('Upload failed');
-
+  
       const data = await response.json();
       console.log('Upload success:', data);
-
+  
       // Fermer la modale et vider le fichier
       setShowModal(false);
       setSelectedFile(null);
-
+  
       // Appeler le callback pour rafraîchir la liste
       onUploadSuccess();
+  
+      // Recharger la page pour afficher la nouvelle vidéo
+      window.location.reload();
     } catch (error) {
       console.error(error);
       alert('Something went wrong during upload!');
