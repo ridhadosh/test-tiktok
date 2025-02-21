@@ -7,27 +7,51 @@ const fs = require('fs');
 const app = express();
 app.use(cors());
 
-// Tableau en mémoire pour stocker les vidéos (id, src, etc.)
-// (En vrai, on utiliserait une base de données)
-const videos = [];
+// 1) Chemin vers le fichier JSON
+const videosFilePath = path.join(__dirname, 'videos.json');
 
-// Crée le dossier "uploads" s'il n'existe pas
+// 2) Fonction pour lire le fichier JSON et charger en mémoire
+function loadVideos() {
+  if (fs.existsSync(videosFilePath)) {
+    try {
+      const data = fs.readFileSync(videosFilePath, 'utf8');
+      return JSON.parse(data); // renvoie le tableau de vidéos
+    } catch (err) {
+      console.error('Error reading videos.json:', err);
+      return [];
+    }
+  } else {
+    return [];
+  }
+}
+
+// 3) Fonction pour écrire le tableau de vidéos dans le fichier JSON
+function saveVideos(videos) {
+  try {
+    fs.writeFileSync(videosFilePath, JSON.stringify(videos, null, 2));
+  } catch (err) {
+    console.error('Error writing videos.json:', err);
+  }
+}
+
+// 4) On charge en mémoire le tableau de vidéos au démarrage
+let videos = loadVideos();
+
+// 5) Prépare Multer pour l’upload
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// Configurer Multer pour gérer l'upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // ex: 1676929390000.mp4
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
-// Filtrer pour accepter seulement des vidéos
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === 'video/mp4' ||
@@ -43,38 +67,39 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// 1) Endpoint pour uploader
+// 6) Route pour uploader une vidéo
 app.post('/upload', upload.single('video'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded or invalid file type.' });
   }
 
-  // Créer un nouvel objet "vidéo"
+  // On crée un nouvel objet vidéo
   const newVideo = {
     id: Date.now(),
     src: `http://localhost:3001/uploads/${req.file.filename}`,
   };
 
-  // On l'ajoute au tableau en mémoire
+  // On l’ajoute au tableau
   videos.push(newVideo);
 
-  // On renvoie la vidéo nouvellement ajoutée
+  // On sauvegarde dans le fichier JSON
+  saveVideos(videos);
+
   return res.json({
     message: 'File uploaded successfully',
     video: newVideo,
   });
 });
 
-// 2) Servir le dossier "uploads" statiquement (pour lire les vidéos)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// 7) Servir le dossier "uploads" pour accéder aux fichiers
+app.use('/uploads', express.static(uploadDir));
 
-// 3) Endpoint pour récupérer la liste des vidéos
+// 8) Route pour récupérer la liste des vidéos
 app.get('/videos', (req, res) => {
-  // On renvoie simplement le tableau
   res.json(videos);
 });
 
-// Démarrer le serveur sur le port 3001
+// 9) Lancement du serveur
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Back-end running on http://localhost:${PORT}`);
