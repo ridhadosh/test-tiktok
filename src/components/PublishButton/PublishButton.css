@@ -99,20 +99,22 @@
 /* Conteneur des boutons en bas de la carte */
 .button-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center; /* Center the buttons */
   gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* Bouton Upload */
 .upload-btn {
   background-color: #28a745;
   color: #fff;
-  padding: 0.6rem 1.2rem;
+  padding: 0.8rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: opacity 0.2s;
+  min-width: 120px; /* Ensures a consistent button size */
 }
 
 .upload-btn:hover {
@@ -123,14 +125,16 @@
 .cancel-btn {
   background-color: #999;
   color: #fff;
-  padding: 0.6rem 1.2rem;
+  padding: 0.8rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   transition: opacity 0.2s;
+  min-width: 120px;
 }
 
 .cancel-btn:hover {
   opacity: 0.8;
 }
+

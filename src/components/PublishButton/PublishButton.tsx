@@ -81,11 +81,11 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
             {/* Boutons Upload et Annuler */}
             <div className="button-row">
+            <button className="cancel-btn" onClick={() => setShowModal(false)}>
+                Annuler
+              </button>
               <button className="upload-btn" onClick={handleUpload}>
                 Upload
-              </button>
-              <button className="cancel-btn" onClick={() => setShowModal(false)}>
-                Annuler
               </button>
             </div>
           </div>
