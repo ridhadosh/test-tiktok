@@ -27,7 +27,7 @@
 
 /* Video element */
 .video-card__player {
-  width: 78%;
+  max-width: 78%;
   height: 100%;
   object-fit: contain;  /* Ensures the full video is visible without cropping */
   border-radius: 16px;
