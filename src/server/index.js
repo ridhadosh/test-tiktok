@@ -5,17 +5,22 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
+
+/* 1) Middlewares */
 app.use(cors());
+// Needed to parse JSON bodies (for POST comments)
+app.use(express.json());
 
-// 1) Chemin vers le fichier JSON
+/* 2) Paths to our JSON files */
 const videosFilePath = path.join(__dirname, 'videos.json');
+const commentsFilePath = path.join(__dirname, 'comments.json');
 
-// 2) Fonction pour lire le fichier JSON et charger en mémoire
+/* 3) Helper functions to load/save videos */
 function loadVideos() {
   if (fs.existsSync(videosFilePath)) {
     try {
       const data = fs.readFileSync(videosFilePath, 'utf8');
-      return JSON.parse(data); // renvoie le tableau de vidéos
+      return JSON.parse(data); // returns the array of videos
     } catch (err) {
       console.error('Error reading videos.json:', err);
       return [];
@@ -25,7 +30,6 @@ function loadVideos() {
   }
 }
 
-// 3) Fonction pour écrire le tableau de vidéos dans le fichier JSON
 function saveVideos(videos) {
   try {
     fs.writeFileSync(videosFilePath, JSON.stringify(videos, null, 2));
@@ -34,10 +38,34 @@ function saveVideos(videos) {
   }
 }
 
-// 4) On charge en mémoire le tableau de vidéos au démarrage
-let videos = loadVideos();
+/* 4) Helper functions to load/save comments */
+function loadComments() {
+  if (fs.existsSync(commentsFilePath)) {
+    try {
+      const data = fs.readFileSync(commentsFilePath, 'utf8');
+      return JSON.parse(data); // returns an object keyed by videoId
+    } catch (err) {
+      console.error('Error reading comments.json:', err);
+      return {};
+    }
+  } else {
+    return {};
+  }
+}
 
-// 5) Prépare Multer pour l’upload
+function saveComments(comments) {
+  try {
+    fs.writeFileSync(commentsFilePath, JSON.stringify(comments, null, 2));
+  } catch (err) {
+    console.error('Error writing comments.json:', err);
+  }
+}
+
+/* 5) Load initial data into memory */
+let videos = loadVideos();
+let comments = loadComments();
+
+/* 6) Set up Multer for video uploads */
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
@@ -67,22 +95,24 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// 6) Route pour uploader une vidéo
+/* 7) Route for uploading a video */
 app.post('/upload', upload.single('video'), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded or invalid file type.' });
+    return res
+      .status(400)
+      .json({ error: 'No file uploaded or invalid file type.' });
   }
 
-  // On crée un nouvel objet vidéo
+  // Create a new video object
   const newVideo = {
     id: Date.now(),
     src: `http://localhost:3001/uploads/${req.file.filename}`,
   };
 
-  // On l’ajoute au tableau
+  // Add it to the videos array
   videos.push(newVideo);
 
-  // On sauvegarde dans le fichier JSON
+  // Save to JSON
   saveVideos(videos);
 
   return res.json({
@@ -91,15 +121,55 @@ app.post('/upload', upload.single('video'), (req, res) => {
   });
 });
 
-// 7) Servir le dossier "uploads" pour accéder aux fichiers
+/* 8) Serve the "uploads" folder */
 app.use('/uploads', express.static(uploadDir));
 
-// 8) Route pour récupérer la liste des vidéos
+/* 9) Route to retrieve the list of videos */
 app.get('/videos', (req, res) => {
   res.json(videos);
 });
 
-// 9) Lancement du serveur
+/* 10) Routes for comments */
+
+// GET comments for a specific video
+app.get('/comments/:videoId', (req, res) => {
+  const { videoId } = req.params;
+  // Return array of comments for this video ID or empty array if none
+  const videoComments = comments[videoId] || [];
+  res.json(videoComments);
+});
+
+// POST a new comment for a specific video
+app.post('/comments/:videoId', (req, res) => {
+  const { videoId } = req.params;
+  const { user, text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ error: 'Comment text is required.' });
+  }
+
+  // If no array for this video, create it
+  if (!comments[videoId]) {
+    comments[videoId] = [];
+  }
+
+  const newComment = {
+    id: Date.now(),           // Unique-ish ID
+    user: user || 'Anonymous',
+    text,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Push the new comment to the array
+  comments[videoId].push(newComment);
+
+  // Save to JSON
+  saveComments(comments);
+
+  res.json(newComment);
+});
+
+/* 11) Start the server */
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Back-end running on http://localhost:${PORT}`);
