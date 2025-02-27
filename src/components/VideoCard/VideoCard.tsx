@@ -1,13 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './VideoCard.css';
 
-// A simple global variable to disable comments for *all* videos once user closes.
+// Variable globale pour désactiver les commentaires sur toutes les vidéos
 let globalCommentsDisabled = false;
 
+// Définis l'interface si tu n'as pas déjà un type commun dans `types.ts`
 interface VideoData {
   id: number;
   src: string;
-  // any other fields
+  // autres champs si besoin...
 }
 
 interface VideoCardProps {
@@ -18,29 +19,46 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Playback states
+  // État de lecture de la vidéo
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
-  // Counters and like state
+  // Compteurs
   const [likes, setLikes] = useState(234);
   const [shares, setShares] = useState(12);
   const [cartAdds, setCartAdds] = useState(8);
   const [isLiked, setIsLiked] = useState(false);
 
-  // Comments
+  // Gestion des commentaires
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [commentText, setCommentText] = useState('');
   const [commentsCount, setCommentsCount] = useState(0);
-
-  // Is the comment sidebar open for this video?
   const [isCommentOpen, setIsCommentOpen] = useState(false);
-
-  // Local manual override: If the user toggles comments (open/close) for this video,
-  // we don’t auto‐open them while it's still in view.
   const [manualOverride, setManualOverride] = useState(false);
 
-  // 1) Fetch comments for this video
+  // État pour la fenêtre de partage
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
+  // Lien de partage fictif (ex. style TikTok)
+  const shareLink = `http://localhost:3001/uploads/${video.id}`;
+
+  // Options de partage (icônes Font Awesome + liens)
+  const shareOptions = [
+    { name: 'Repost',         icon: 'fa fa-retweet',      link: '#' },
+    { name: 'Send to friends',icon: 'fa fa-paper-plane',  link: '#' },
+    { name: 'Embed',          icon: 'fa fa-code',         link: '#' },
+    { name: 'WhatsApp',       icon: 'fa fa-whatsapp',     link: 'https://web.whatsapp.com' },
+    { name: 'Facebook',       icon: 'fa fa-facebook',     link: 'https://facebook.com' },
+    { name: 'X',              icon: 'fa fa-twitter',      link: 'https://twitter.com' },
+    { name: 'Telegram',       icon: 'fa fa-telegram',     link: 'https://telegram.org' },
+    { name: 'LinkedIn',       icon: 'fa fa-linkedin',     link: 'https://linkedin.com' },
+    { name: 'Reddit',         icon: 'fa fa-reddit',       link: 'https://reddit.com' },
+    { name: 'Pinterest',      icon: 'fa fa-pinterest',    link: 'https://pinterest.com' },
+  ];
+
+  /* ------------------------------------------------------------------
+     1) Charger les commentaires pour cette vidéo
+  ------------------------------------------------------------------ */
   const fetchComments = async () => {
     try {
       const res = await fetch(`http://localhost:3001/comments/${video.id}`);
@@ -54,24 +72,28 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
   };
 
-  // 2) Update commentsCount whenever commentsList changes
+  /* ------------------------------------------------------------------
+     2) Mettre à jour le nombre de commentaires quand la liste change
+  ------------------------------------------------------------------ */
   useEffect(() => {
     setCommentsCount(commentsList.length);
   }, [commentsList]);
 
-  // 3) Intersection Observer for auto‐opening/closing comments
+  /* ------------------------------------------------------------------
+     3) Intersection Observer pour auto‐ouvrir/fermer la sidebar des coms
+  ------------------------------------------------------------------ */
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
-          // If globally disabled or manually overridden, don't auto‐open
+          // Si pas désactivé globalement ni manuellement, on ouvre
           if (!globalCommentsDisabled && !manualOverride && !isCommentOpen) {
             setIsCommentOpen(true);
             fetchComments();
           }
         } else {
-          // When scrolled out, close comments and reset manual override
+          // Quand on sort de la zone visible
           setIsCommentOpen(false);
           setManualOverride(false);
         }
@@ -87,7 +109,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     };
   }, [manualOverride, isCommentOpen, video.id]);
 
-  // 4) Intersection Observer for video play/pause
+  /* ------------------------------------------------------------------
+     4) Intersection Observer pour jouer/pauser la vidéo auto
+  ------------------------------------------------------------------ */
   useEffect(() => {
     if (!videoRef.current) return;
     const playObserver = new IntersectionObserver(
@@ -98,7 +122,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           setIsPlaying(true);
         } else {
           videoRef.current?.pause();
-          if (videoRef.current) videoRef.current.currentTime = 0;
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+          }
           setIsPlaying(false);
         }
       },
@@ -111,15 +137,20 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     };
   }, []);
 
-  // 5) Play/Pause when user clicks the video
+  /* ------------------------------------------------------------------
+     5) Lecture/Pause quand on clique sur la vidéo
+  ------------------------------------------------------------------ */
   const handleVideoPress = () => {
     if (!videoRef.current) return;
-    // Pause other videos
+    // Mettre en pause les autres vidéos
     const allVideos = document.querySelectorAll('video');
     allVideos.forEach((vid) => {
-      if (vid !== videoRef.current) vid.pause();
+      if (vid !== videoRef.current) {
+        vid.pause();
+      }
     });
 
+    // Lecture/pause
     if (isPlaying) {
       videoRef.current.pause();
       setShowControlIcon('pause');
@@ -129,11 +160,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
     setIsPlaying(!isPlaying);
 
-    // Hide icon after 700ms
+    // Faire disparaître l'icône après 700ms
     setTimeout(() => setShowControlIcon(null), 700);
   };
 
-  // 6) Like/Unlike
+  /* ------------------------------------------------------------------
+     6) Gérer le like/unlike
+  ------------------------------------------------------------------ */
   const toggleLike = () => {
     setIsLiked((prev) => {
       const newState = !prev;
@@ -142,14 +175,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     });
   };
 
-  // 7) Toggle comment sidebar *manually* (via comment icon)
+  /* ------------------------------------------------------------------
+     7) Ouvrir/fermer les commentaires manuellement
+  ------------------------------------------------------------------ */
   const toggleComments = () => {
     setIsCommentOpen((prev) => {
       const newState = !prev;
-      // Mark that user manually toggled comments for this video
       setManualOverride(true);
-
-      // If opening, fetch
       if (newState) {
         fetchComments();
       }
@@ -157,25 +189,25 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     });
   };
 
-  // 8) Close comments (via X button)
-  //    Also set a global override so no other videos will auto‐open.
+  /* ------------------------------------------------------------------
+     8) Fermer les commentaires (bouton X) et les désactiver globalement
+  ------------------------------------------------------------------ */
   const handleCloseComments = () => {
     setIsCommentOpen(false);
-    setManualOverride(true);      // Keep it closed for this video
-    globalCommentsDisabled = true; // Keep it closed for *all* videos
+    setManualOverride(true);
+    globalCommentsDisabled = true; // désactive auto‐open pour toutes les vidéos
   };
 
-  // 9) Post a new comment
+  /* ------------------------------------------------------------------
+     9) Poster un nouveau commentaire
+  ------------------------------------------------------------------ */
   const handleSendComment = async () => {
     if (!commentText.trim()) return;
     try {
       const res = await fetch(`http://localhost:3001/comments/${video.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user: 'Anonymous', // or your actual user name
-          text: commentText,
-        }),
+        body: JSON.stringify({ user: 'Anonymous', text: commentText }),
       });
       if (!res.ok) throw new Error('Failed to post comment');
       const newComment = await res.json();
@@ -184,6 +216,24 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  /* ------------------------------------------------------------------
+     -- NOUVEAU : Gérer la fenêtre de partage --
+  ------------------------------------------------------------------ */
+  const toggleShareModal = () => {
+    setIsShareOpen(!isShareOpen);
+    // Optionnel : incrémenter le compteur "shares"
+    setShares((prev) => prev + 1);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    alert('Link copied!');
+  };
+
+  const handleClickSocial = (url: string) => {
+    window.open(url, '_blank');
   };
 
   return (
@@ -197,6 +247,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           onClick={handleVideoPress}
         />
 
+        {/* Icône Play/Pause au centre (disparaît après 700ms) */}
         {showControlIcon && (
           <div className="video-status-icon">
             {showControlIcon === 'play' ? (
@@ -207,19 +258,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         )}
 
+        {/* Actions (Like, Comment, Share, Cart) */}
         <div className="video-card__actions">
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
             <span className="counter">{likes}</span>
           </div>
 
-          {/* Clicking this toggles comments manually */}
           <div className="action-container" onClick={toggleComments}>
             <i className="fa fa-comment action-btn"></i>
             <span className="counter">{commentsCount}</span>
           </div>
 
-          <div className="action-container" onClick={() => setShares((prev) => prev + 1)}>
+          <div className="action-container" onClick={toggleShareModal}>
             <i className="fa fa-share action-btn"></i>
             <span className="counter">{shares}</span>
           </div>
@@ -231,7 +282,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       </div>
 
-      {/* COMMENT SIDEBAR (outside the video, fixed on the right) */}
+      {/* ------------------- SIDEBAR DE COMMENTAIRES ------------------- */}
       {isCommentOpen && (
         <div className="comment-modal" onClick={() => setIsCommentOpen(false)}>
           <div className="comment-container" onClick={(e) => e.stopPropagation()}>
@@ -262,6 +313,47 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
               />
               <button onClick={handleSendComment}>Send</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------- MODALE DE PARTAGE ------------------- */}
+      {isShareOpen && (
+        <div className="share-modal" onClick={() => setIsShareOpen(false)}>
+          <div className="share-container" onClick={(e) => e.stopPropagation()}>
+            <h2>Share to</h2>
+
+            {/* Lien à copier */}
+            <div className="share-link-container">
+              <input
+                type="text"
+                readOnly
+                value={shareLink}
+                className="share-link"
+              />
+              <button className="copy-btn" onClick={handleCopyLink}>
+                Copy
+              </button>
+            </div>
+
+            {/* Icônes de partage en grille */}
+            <div className="share-options-grid">
+              {shareOptions.map((option) => (
+                <div
+                  key={option.name}
+                  className="share-option"
+                  onClick={() => handleClickSocial(option.link)}
+                >
+                  <i className={option.icon}></i>
+                  <span>{option.name}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Bouton de fermeture (X) */}
+            <button className="close-btn" onClick={() => setIsShareOpen(false)}>
+              ✕
+            </button>
           </div>
         </div>
       )}

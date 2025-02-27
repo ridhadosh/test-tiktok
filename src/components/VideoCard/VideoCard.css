@@ -206,3 +206,126 @@
     width: 100%;
   }
 }
+
+/* ================== SHARE MODAL ================== */
+.share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-container {
+  background: #fff;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  padding: 1.5rem;
+  position: relative;
+
+  /* Animation apparence (optionnel) */
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+.share-container h2 {
+  margin-top: 0;
+  text-align: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Bouton de fermeture (X) en haut à droite */
+.share-container .close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Lien à copier */
+.share-link-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.share-link {
+  flex: 1;
+  padding: 0.4rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.copy-btn {
+  background-color: #fe2c55;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Grille des icônes de partage */
+.share-options-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  justify-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Chaque icône + label */
+.share-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.share-option i {
+  font-size: 28px;
+  background-color: #f2f2f2;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  color: #555;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.share-option i:hover {
+  transform: scale(1.1);
+  color: #fe2c55;
+}
+
+.share-option span {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #333;
+}
+
+/* Animation d'apparition */
+@keyframes fadeInUp {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
