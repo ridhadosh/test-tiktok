@@ -1,51 +1,58 @@
-/* Main container for each video card */
+/* Main container for each video card (full screen like TikTok) */
 .video-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
-  background-color: #fff;
   width: 100%;
-  height: 90vh;
-  margin-bottom: 10vh;
-  scroll-snap-align: start;
+  height: 100vh;          /* Full viewport height */
+  background-color: #ffffff; /* Black background behind video */
+  overflow: hidden;
+  scroll-snap-align: start;     /* Remove extra bottom spacing */
+
 }
 
-/* Internal container for video and icons */
+/* Wrapper to center the video and place icons on top */
 .video-wrapper {
   position: relative;
+  left: 20%;
+  right: 20%;
   width: 100%;
   max-width: 650px;
   height: 100%;      /* Keeps it large but not full screen */
-  max-height: 90vh;  
+
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   top: 8%;
+  
+  background-color: #000000;
 }
 
-/* Video element */
+/* Video element (fills the screen, like TikTok) */
 .video-card__player {
-  max-width: 78%;
-  height: 80%;
-  object-fit: contain;  /* Ensures the full video is visible without cropping */
-  border-radius: 16px;
-  background-color: #000000; /* Black background for empty spaces */
+  width: auto;
+
+  height: 100%;
+  object-fit: cover;  /* Fill the screen, cropping if needed */
   cursor: pointer;
+  background-color: #351212; 
+  border-radius: 16px;
 }
 
-
-/* Action icons (fixed size buttons) */
+/* Action icons (stacked vertically on the right, over the video) */
 .video-card__actions {
   position: absolute;
-  right: 0.5%;
-  bottom: 8%;
+  bottom: 15%;
+  right: auto;
+  margin-left: 45vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2rem;
+  z-index: 10; 
+      /* Ensure icons appear above the video */
 }
 
+/* Individual icon container */
 .action-container {
   display: flex;
   flex-direction: column;
@@ -53,48 +60,54 @@
   cursor: pointer;
 }
 
-/* Style des icônes */
+/* Icon styling (white on black, TikTok style) */
 .action-btn {
   font-size: 45px;
-  color: #000;
-  cursor: pointer;
+  color: #fff;        /* White icons for visibility on black video */
   transition: color 0.2s;
 }
 
-
-
-/* Effet quand un bouton est liké */
+/* Like effect */
 .liked {
   color: #fe2c55;
   transform: scale(1.1);
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
-/* Changement de couleur au hover si déjà liké */
+/* Hover on liked icon */
 .liked:hover {
-  color: #c91540;  /* Une teinte plus foncée pour l’effet */
+  color: #c91540;
 }
 
-/* Style du compteur (texte sous l’icône) */
+/* Counter (under each icon) */
 .counter {
   font-size: 16px;
-  color: #333;
+  color: #fff;
   font-weight: bold;
   margin-top: 5px;
 }
 
+/* Hover animation on icons */
 .action-btn:hover {
   animation: bounce 0.5s ease;
 }
 
-/* Style du compteur (texte sous l’icône) */
-.counter {
-  font-size: 16px;
-  color: #333;
-  font-weight: bold;
-  margin-top: 5px;
+@keyframes bounce {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  30% {
+    transform: scale(1.2) translateY(-10px);
+  }
+  50% {
+    transform: scale(0.95) translateY(5px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
 }
 
+/* Show pause/play icon in center of video */
 .video-status-icon {
   position: absolute;
   top: 50%;
@@ -104,9 +117,10 @@
   color: #fff;
   opacity: 0.8;
   pointer-events: none;
+  z-index: 11; /* Above video, but below any modals */
 }
 
-/* COMMENT MODAL - positioned on the right side of the page */
+/* COMMENT MODAL - fixed on the right side (optional) */
 .comment-modal {
   position: fixed;
   top: 0;
@@ -183,27 +197,14 @@
   border-radius: 5px;
 }
 
-
-
-@keyframes bounce {
-  0% {
-    transform: scale(1) translateY(0);
-  }
-  30% {
-    transform: scale(1.2) translateY(-10px);
-  }
-  50% {
-    transform: scale(0.95) translateY(5px);
-  }
-  100% {
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* For smaller screens, let the wrapper take full width */
+/* For smaller screens, let the video still fill the height */
 @media (max-width: 768px) {
+  .video-card {
+    height: 100vh;
+  }
   .video-wrapper {
     width: 100%;
+    height: 100%;
   }
 }
 
