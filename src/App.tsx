@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'font-awesome/css/font-awesome.min.css';
 import HomePage from './pages/HomePage';
 import Navbar from './components/Navbar/Navbar';
+import FavoritesPage from './components/FavoritesPage/FavoritesPage';
 
 const App: React.FC = () => {
   return (
@@ -11,7 +12,7 @@ const App: React.FC = () => {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          {/* Ajoute ici tes routes pour d'autres pages (ex: profil, détail vidéo, etc.) */}
+          <Route path="/favorites" element={<FavoritesPage />} />
         </Routes>
       </div>
     </Router>

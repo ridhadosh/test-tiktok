@@ -56,6 +56,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     { name: 'Pinterest',      icon: 'fa fa-pinterest',    link: 'https://pinterest.com' },
   ];
 
+
+  const [isFavorited, setIsFavorited] = useState(false);
+
+
   /* ------------------------------------------------------------------
      1) Charger les commentaires pour cette vidéo
   ------------------------------------------------------------------ */
@@ -263,6 +267,38 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     window.open(url, '_blank');
   };
 
+
+  // --------------------------------------------
+  // -- FAVORIS --
+  // --------------------------------------------
+
+  // Au montage, vérifier si cette vidéo est déjà dans les favoris (stockés en localStorage)
+  useEffect(() => {
+    const storedFavs = localStorage.getItem('favorites');
+    const favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
+    if (favIds.includes(video.id)) {
+      setIsFavorited(true);
+    }
+  }, [video.id]);
+
+  // Fonction pour ajouter/enlever la vidéo des favoris
+  const toggleFavorite = () => {
+    const storedFavs = localStorage.getItem('favorites');
+    let favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
+
+    if (favIds.includes(video.id)) {
+      // Retirer des favoris
+      favIds = favIds.filter((id) => id !== video.id);
+      setIsFavorited(false);
+    } else {
+      // Ajouter aux favoris
+      favIds.push(video.id);
+      setIsFavorited(true);
+    }
+
+    localStorage.setItem('favorites', JSON.stringify(favIds));
+  };
+
   return (
     <div ref={containerRef} className="video-card">
       <div className="video-wrapper">
@@ -305,6 +341,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           <div className="action-container" onClick={() => setCartAdds((prev) => prev + 1)}>
             <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">{cartAdds}</span>
+          </div>
+          
+          <div className="action-container" onClick={toggleFavorite}>
+            <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
+            <span className="counter">Fav</span>
           </div>
         </div>
       </div>
