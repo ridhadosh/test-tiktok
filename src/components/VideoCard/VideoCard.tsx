@@ -136,7 +136,34 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       if (videoRef.current) playObserver.unobserve(videoRef.current);
     };
   }, []);
-
+  /* ------------------------------------------------------------------
+     4.5) Détection du format vidéo et application des classes CSS
+  ------------------------------------------------------------------ */
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return; // Guard against null
+  
+    // Assert that 'vid' is an HTMLVideoElement
+    const videoEl = vid as HTMLVideoElement;
+  
+    function handleMetadata() {
+      const { videoWidth, videoHeight } = videoEl;
+      if (videoHeight > videoWidth) {
+        videoEl.classList.add('vertical-video');
+        videoEl.classList.remove('horizontal-video');
+      } else {
+        videoEl.classList.add('horizontal-video');
+        videoEl.classList.remove('vertical-video');
+      }
+    }
+  
+    videoEl.addEventListener('loadedmetadata', handleMetadata);
+    return () => {
+      videoEl.removeEventListener('loadedmetadata', handleMetadata);
+    };
+  }, []);
+  
+  
   /* ------------------------------------------------------------------
      5) Lecture/Pause quand on clique sur la vidéo
   ------------------------------------------------------------------ */
