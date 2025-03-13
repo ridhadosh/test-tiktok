@@ -125,19 +125,7 @@ app.post('/upload', upload.single('video'), (req, res) => {
 app.use('/uploads', express.static(uploadDir));
 
 app.get('/videos', (req, res) => {
-  // 1) Récupérer la page et la limite
-  const page = parseInt(req.query.page) || 0;  // page courante (par défaut 0)
-  const limit = parseInt(req.query.limit) || 5; // nombre de vidéos par page (par défaut 5)
-
-  // 2) Calculer l’intervalle
-  const start = page * limit;
-  const end = start + limit;
-
-  // 3) Extraire la portion du tableau
-  const chunk = videos.slice(start, end);
-
-  // 4) Renvoyer le tableau chunk
-  res.json(chunk);
+  res.json(videos);
 });
 
 /* 10) Routes for comments */
