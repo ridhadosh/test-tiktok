@@ -352,6 +352,24 @@
   color: #333;
 }
 
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 0rem; /* Espace entre la photo et l'icône Like */
+  cursor: pointer;     /* si tu veux un curseur clic */
+}
+
+.profile-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #fff; /* optionnel, un contour blanc */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+}
+
+
 /* Animation d'apparition */
 @keyframes fadeInUp {
   0% {

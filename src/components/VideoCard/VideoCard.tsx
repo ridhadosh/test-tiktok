@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './VideoCard.css';
+import defaultProfile from '../assets/default-avatar.png';
 
 // Variable globale pour désactiver les commentaires sur toutes les vidéos
 let globalCommentsDisabled = false;
@@ -323,6 +324,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
         {/* Actions (Like, Comment, Share, Cart) */}
         <div className="video-card__actions">
+          {/* Profil */}
+          <div className="action-container profile-container">
+            <img
+              src={defaultProfile}
+              alt="Profil"
+              className="profile-icon"
+            />
+          </div>
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
             <span className="counter">{likes}</span>
