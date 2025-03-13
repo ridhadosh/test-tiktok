@@ -37,13 +37,13 @@
   background: #fff;
   border-radius: 12px;
   padding: 2rem;
-  width: 400px;
+  width: 600px;
   max-width: 90%;
+  min-height: 300px;   /* Added min-height */
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-
-  /* Animation d'apparition (optionnelle) */
   animation: fadeInUp 0.3s ease forwards;
 }
+
 
 @keyframes fadeInUp {
   0% {
@@ -139,5 +139,34 @@
 
 .cancel-btn:hover {
   opacity: 0.8;
+}
+
+.preview-video {
+  margin-top: 1rem;
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.description-wrapper {
+  margin-top: 1rem;
+}
+
+.description-wrapper label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.description-wrapper textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: none; /* prevent user resizing */
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 

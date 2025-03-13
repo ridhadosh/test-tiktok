@@ -1,13 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './PublishButton.css';
 
 interface PublishButtonProps {
-  onUploadSuccess: () => void; // callback à appeler après succès
+  onUploadSuccess: () => void;
 }
 
 const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewURL, setPreviewURL] = useState<string | null>(null);
+  const [description, setDescription] = useState('');
+
+  // Clean up the object URL whenever previewURL changes or on unmount
+  useEffect(() => {
+    return () => {
+      if (previewURL) {
+        URL.revokeObjectURL(previewURL);
+      }
+    };
+  }, [previewURL]);
 
   const handlePublish = () => {
     setShowModal(true);
@@ -15,7 +26,13 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      // Revoke the old preview URL if it exists, then create a new one
+      if (previewURL) {
+        URL.revokeObjectURL(previewURL);
+      }
+      setPreviewURL(URL.createObjectURL(file));
     }
   };
 
@@ -24,28 +41,27 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       alert('Please select a video file first!');
       return;
     }
-  
+
     const formData = new FormData();
     formData.append('video', selectedFile);
-  
+    formData.append('description', description);
+
     try {
       const response = await fetch('http://localhost:3001/upload', {
         method: 'POST',
         body: formData,
       });
       if (!response.ok) throw new Error('Upload failed');
-  
+
       const data = await response.json();
       console.log('Upload success:', data);
-  
-      // Fermer la modale et vider le fichier
+
       setShowModal(false);
       setSelectedFile(null);
-  
-      // Appeler le callback pour rafraîchir la liste
+      setPreviewURL(null);
+      setDescription('');
+
       onUploadSuccess();
-  
-      // Recharger la page pour afficher la nouvelle vidéo
       window.location.reload();
     } catch (error) {
       console.error(error);
@@ -64,7 +80,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
           <div className="modal-card">
             <h2>Publier une vidéo</h2>
 
-            {/* Wrapper pour le "Choose File" + nom du fichier */}
+            {/* File input */}
             <div className="file-input-wrapper">
               <label htmlFor="videoFile" className="choose-file-btn">
                 Choisir un fichier
@@ -76,15 +92,35 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
                 onChange={handleFileChange}
                 style={{ display: 'none' }}
               />
-              {/* Si un fichier est sélectionné, on affiche son nom */}
               {selectedFile && (
                 <span className="file-name">{selectedFile.name}</span>
               )}
             </div>
 
-            {/* Boutons Upload et Annuler */}
+            {/* Video preview */}
+            {previewURL && (
+              <video
+                src={previewURL}
+                className="preview-video"
+                controls
+                width="100%"
+                style={{ marginTop: '1rem' }}
+              />
+            )}
+
+            {/* Description input */}
+            <div className="description-wrapper" style={{ marginTop: '1rem' }}>
+              <label htmlFor="videoDescription">Description (facultatif):</label>
+              <textarea
+                id="videoDescription"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ajoutez une description à votre vidéo"
+              />
+            </div>
+
             <div className="button-row">
-            <button className="cancel-btn" onClick={() => setShowModal(false)}>
+              <button className="cancel-btn" onClick={() => setShowModal(false)}>
                 Annuler
               </button>
               <button className="upload-btn" onClick={handleUpload}>

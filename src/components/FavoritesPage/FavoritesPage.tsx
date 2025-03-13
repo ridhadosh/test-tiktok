@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import VideoCard from '../VideoCard/VideoCard';
 import { VideoData } from '../../types';
+import '../FavoritesPage/FavoritesPage.css';
 
 const FavoritesPage: React.FC = () => {
   const [favoriteVideos, setFavoriteVideos] = useState<VideoData[]>([]);
@@ -31,7 +32,7 @@ const FavoritesPage: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div className="video-feed">
       {favoriteVideos.length === 0 ? (
         <p>Aucune vidéo en favoris.</p>
       ) : (

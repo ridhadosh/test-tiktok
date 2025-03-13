@@ -1,8 +1,7 @@
-// src/types.ts
 export interface VideoData {
-    id: number;
-    src: string;
-    title?: string;           // Propriété optionnelle
-    productLink?: string;     // Optionnel aussi, si tu veux
-  }
-  
+  id: number;
+  src: string;
+  title?: string;           // Optional title
+  productLink?: string;     // Optional product link
+  description?: string;     // Optional description field
+}
