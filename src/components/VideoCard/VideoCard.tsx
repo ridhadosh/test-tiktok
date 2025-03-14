@@ -18,10 +18,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
-  // Compteurs (simples démos)
-  const [likes, setLikes] = useState(234);
-  const [shares, setShares] = useState(12);
-  const [cartAdds, setCartAdds] = useState(8);
+  // Compteurs
+  const [likes, setLikes] = useState(0);
+  const [shares, setShares] = useState(0);
+  const [cartAdds, setCartAdds] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
   // Commentaires
@@ -30,8 +30,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [commentsCount, setCommentsCount] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [manualOverride, setManualOverride] = useState(false);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  // Partage
+
+  const handleCartClick = () => {
+    setIsCartModalOpen(true);
+  };
+  
+
+  // État pour la fenêtre de partage
   const [isShareOpen, setIsShareOpen] = useState(false);
   const shareLink = `http://localhost:3001/uploads/${video.id}`;
   const shareOptions = [
@@ -223,21 +231,25 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   ------------------------------------------------------------------ */
   const toggleShareModal = () => {
     setIsShareOpen(!isShareOpen);
-    setShares((prev) => prev + 1);
   };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
     alert('Link copied!');
+    setShares((prev) => prev + 1); // 🔥 Incrémente uniquement après copie
   };
-
+  
   const handleClickSocial = (url: string) => {
     window.open(url, '_blank');
+    setShares((prev) => prev + 1); // 🔥 Incrémente uniquement après un vrai clic
   };
 
-  /* ------------------------------------------------------------------
-     -- FAVORIS --
-  ------------------------------------------------------------------ */
+
+  // --------------------------------------------
+  // -- FAVORIS --
+  // --------------------------------------------
+
+  // Au montage, vérifier si cette vidéo est déjà dans les favoris (stockés en localStorage)
   useEffect(() => {
     const storedFavs = localStorage.getItem('favorites');
     const favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
@@ -286,15 +298,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         {/* Les icônes (Profil, Like, Comment, Share, Cart, Fav) */}
         <div className="video-card__actions">
           {/* Profil */}
-          <div className="action-container profile-container">
-            <img
-              src={defaultProfile}
-              alt="Profil"
-              className="profile-icon"
-            />
-          </div>
-
-          {/* Like */}
+          <div className="action-container profile-container" onClick={() => setIsProfileModalOpen(true)}>
+          <img
+            src={defaultProfile}
+            alt="Profil"
+            className="profile-icon"
+          />
+        </div>
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
             <span className="counter">{likes}</span>
@@ -312,8 +322,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <span className="counter">{shares}</span>
           </div>
 
-          {/* Cart */}
-          <div className="action-container" onClick={() => setCartAdds((prev) => prev + 1)}>
+            <div className="action-container" onClick={handleCartClick}>
             <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">{cartAdds}</span>
           </div>
@@ -333,7 +342,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         )}
       </div>
 
-      {/* Sidebar de commentaires */}
+        {/* ------------------- MODALE DU PROFIL ------------------- */}
+      {isProfileModalOpen && (
+        <div className="cart-modal" onClick={() => setIsProfileModalOpen(false)}>
+          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+            <h2>👤 Profil Utilisateur</h2>
+            <p>Ici il faut ouvrir le profile d'utilisateur</p>
+            <button className="close-btn" onClick={() => setIsProfileModalOpen(false)}>✕</button>
+          </div>
+        </div>
+      )}
+
+
+      {/* ------------------- SIDEBAR DE COMMENTAIRES ------------------- */}
       {isCommentOpen && (
         <div className="comment-modal" onClick={() => setIsCommentOpen(false)}>
           <div className="comment-container" onClick={(e) => e.stopPropagation()}>
@@ -398,6 +419,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         </div>
       )}
+          {/* ------------------- MODALE DU PANIER ------------------- */}
+    {isCartModalOpen && (
+      <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
+        <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+          <h2>🎟 Ajouter au panier</h2>
+          <p>Ici il faut mettre la route vers le billet</p>
+          <button className="close-btn" onClick={() => setIsCartModalOpen(false)}>✕</button>
+        </div>
+      </div>
+    )}
     </div>
   );
 };
