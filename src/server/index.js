@@ -103,10 +103,13 @@ app.post('/upload', upload.single('video'), (req, res) => {
       .json({ error: 'No file uploaded or invalid file type.' });
   }
 
+  const { description } = req.body;
+
   // Create a new video object
   const newVideo = {
     id: Date.now(),
     src: `http://localhost:3001/uploads/${req.file.filename}`,
+    description: description || '',
   };
 
   // Add it to the videos array

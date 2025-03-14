@@ -369,6 +369,29 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
 }
 
+/* Description overlay en bas, façon TikTok */
+.video-description-overlay {
+  position: absolute;
+  bottom: 0;       /* collé en bas du conteneur .video-wrapper */
+  left: 0;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #fff;
+  z-index: 11;     /* au-dessus de la vidéo */
+  
+  /* Petit dégradé pour la lisibilité */
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+
+  /* Si tu veux laisser la vidéo cliquable derrière le texte : pointer-events: none; 
+     Mais du coup on ne peut pas sélectionner le texte 
+  */
+  pointer-events: auto;
+}
+
+
+
 
 /* Animation d'apparition */
 @keyframes fadeInUp {
