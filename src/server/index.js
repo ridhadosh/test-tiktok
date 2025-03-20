@@ -6,6 +6,15 @@ const fs = require('fs');
 
 const app = express();
 
+const mysql = require('mysql2');
+
+const db = mysql.createPool({
+  host: 'localhost',         // ou l’adresse de ton serveur MySQL
+  user: 'focusonr_exhib1tUser',    // identifiant MySQL
+  password: 'iK+B-dewPdJX', // mot de passe MySQL
+  database: 'focusonr_exhib1t'      // nom de la base WP
+});
+
 /* 1) Middlewares */
 app.use(cors());
 // Needed to parse JSON bodies (for POST comments)
@@ -96,33 +105,57 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 
 /* 7) Route for uploading a video */
+// app.post('/upload', upload.single('video'), (req, res) => {
+//   if (!req.file) {
+//     return res
+//       .status(400)
+//       .json({ error: 'No file uploaded or invalid file type.' });
+//   }
+
+//   const { description } = req.body;
+
+//   // Create a new video object
+//   const newVideo = {
+//     id: Date.now(),
+//     src: `http://localhost:3001/uploads/${req.file.filename}`,
+//     description: description || '',
+//   };
+
+//   // Add it to the videos array
+//   videos.push(newVideo);
+
+//   // Save to JSON
+//   saveVideos(videos);
+
+//   return res.json({
+//     message: 'File uploaded successfully',
+//     video: newVideo,
+//   });
+// });
+
+
 app.post('/upload', upload.single('video'), (req, res) => {
   if (!req.file) {
-    return res
-      .status(400)
-      .json({ error: 'No file uploaded or invalid file type.' });
+    return res.status(400).json({ error: 'No file uploaded' });
   }
-
   const { description } = req.body;
+  const src = `https://ton-domaine.com/uploads/${req.file.filename}`;
 
-  // Create a new video object
-  const newVideo = {
-    id: Date.now(),
-    src: `http://localhost:3001/uploads/${req.file.filename}`,
-    description: description || '',
-  };
-
-  // Add it to the videos array
-  videos.push(newVideo);
-
-  // Save to JSON
-  saveVideos(videos);
-
-  return res.json({
-    message: 'File uploaded successfully',
-    video: newVideo,
+  const sql = 'INSERT INTO wp_videos (src, description) VALUES (?, ?)';
+  db.query(sql, [src, description || ''], (err, result) => {
+    if (err) {
+      console.error('MySQL insert error:', err);
+      return res.status(500).json({ error: 'DB insert failed' });
+    }
+    const newVideo = {
+      id: result.insertId,
+      src,
+      description: description || '',
+    };
+    res.json({ message: 'File uploaded', video: newVideo });
   });
 });
+
 
 /* 8) Serve the "uploads" folder */
 app.use('/uploads', express.static(uploadDir));
