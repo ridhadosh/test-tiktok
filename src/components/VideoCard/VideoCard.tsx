@@ -41,7 +41,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
   // État pour la fenêtre de partage
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const shareLink = `http://localhost:3001/uploads/${video.id}`;
+  const shareLink = video.src;
   const shareOptions = [
     { name: 'Repost',         icon: 'fa fa-retweet',      link: '#' },
     { name: 'Send to friends',icon: 'fa fa-paper-plane',  link: '#' },
@@ -63,7 +63,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   ------------------------------------------------------------------ */
   const fetchComments = async () => {
     try {
-      const res = await fetch(`http://localhost:3001/comments/${video.id}`);
+      const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`);
       if (!res.ok) throw new Error('Failed to fetch comments');
       const data = await res.json();
       setCommentsList(data);
@@ -212,7 +212,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const handleSendComment = async () => {
     if (!commentText.trim()) return;
     try {
-      const res = await fetch(`http://localhost:3001/comments/${video.id}`, {
+      const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user: 'Anonymous', text: commentText }),

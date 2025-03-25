@@ -8,7 +8,7 @@ const FavoritesPage: React.FC = () => {
 
   useEffect(() => {
     // 1) Récupère la liste de TOUTES les vidéos
-    fetch('http://localhost:3001/videos')
+    fetch('https://exhib1t.com/wp-json/tiktok/v1/videos')
       .then((res) => {
         if (!res.ok) throw new Error('Failed to fetch videos');
         return res.json();

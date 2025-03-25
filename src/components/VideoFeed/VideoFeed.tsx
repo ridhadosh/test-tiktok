@@ -11,7 +11,7 @@ const VideoFeed: React.FC = () => {
   const fetchVideos = async () => {
     try {
       // Remplace l’URL par ton adresse (avec ou sans proxy)
-      const response = await fetch('http://localhost:3001/videos');
+      const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/videos');
       if (!response.ok) {
         throw new Error('Failed to fetch videos');
       }
