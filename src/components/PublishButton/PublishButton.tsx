@@ -11,7 +11,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [previewURL, setPreviewURL] = useState<string | null>(null);
   const [description, setDescription] = useState('');
 
-  // Clean up the object URL whenever previewURL changes or on unmount
+  // Nettoyage de l'URL de preview quand on change de fichier ou démonte le composant
   useEffect(() => {
     return () => {
       if (previewURL) {
@@ -28,7 +28,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      // Revoke the old preview URL if it exists, then create a new one
+      // On révoque l'ancienne preview si elle existe, puis on crée la nouvelle
       if (previewURL) {
         URL.revokeObjectURL(previewURL);
       }
@@ -47,7 +47,8 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
     formData.append('description', description);
 
     try {
-      const response = await fetch('http://localhost:3001/upload', {
+      // Appel vers l’endpoint WordPress
+      const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
         method: 'POST',
         body: formData,
       });
@@ -56,13 +57,18 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       const data = await response.json();
       console.log('Upload success:', data);
 
+      // Fermer la modale, réinitialiser le formulaire
       setShowModal(false);
       setSelectedFile(null);
       setPreviewURL(null);
       setDescription('');
 
+      // Callback parent
       onUploadSuccess();
+
+      // Optionnel: recharger la page pour forcer un refresh
       window.location.reload();
+
     } catch (error) {
       console.error(error);
       alert('Something went wrong during upload!');
@@ -80,7 +86,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
           <div className="modal-card">
             <h2>Publier une vidéo</h2>
 
-            {/* File input */}
+            {/* Sélection de fichier */}
             <div className="file-input-wrapper">
               <label htmlFor="videoFile" className="choose-file-btn">
                 Choisir un fichier
@@ -97,7 +103,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               )}
             </div>
 
-            {/* Video preview */}
+            {/* Preview vidéo */}
             {previewURL && (
               <video
                 src={previewURL}
@@ -108,7 +114,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               />
             )}
 
-            {/* Description input */}
+            {/* Champ description */}
             <div className="description-wrapper" style={{ marginTop: '1rem' }}>
               <label htmlFor="videoDescription">Description (facultatif):</label>
               <textarea
