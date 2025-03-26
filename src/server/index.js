@@ -24,7 +24,7 @@ const db = mysql.createPool({
 
 /**
  * 1) /videos : lit la table wp_videos
- */
+ 
 app.get('/videos', (req, res) => {
   const sql = 'SELECT * FROM wp_videos';
   db.query(sql, (err, results) => {
@@ -36,6 +36,21 @@ app.get('/videos', (req, res) => {
     res.json(results);
   });
 });
+*/
+
+//this one includes the ticket (I commented yours)
+app.get('/videos', (req, res) => {
+  const sql = 'SELECT id, src, description, ticket_link FROM wp_videos'; // Ajout de ticket_link
+  db.query(sql, (err, results) => {
+    if (err) {
+      console.error('MySQL error:', err);
+      return res.status(500).json({ error: 'DB error' });
+    }
+    res.json(results);
+  });
+});
+
+
 
 /**
  * 2) Gérer les commentaires (si vous voulez les garder côté Node)

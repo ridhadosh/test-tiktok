@@ -10,6 +10,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
   const [description, setDescription] = useState('');
+  const [ticketLink, setTicketLink] = useState('');
 
   // Nettoyage de l'URL de preview quand on change de fichier ou démonte le composant
   useEffect(() => {
@@ -122,6 +123,19 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ajoutez une description à votre vidéo"
+              />
+            </div>
+            
+            {/* Champ pour le lien du ticket */}
+            <div className="ticket-link-wrapper" style={{ marginTop: '1rem' }}>
+              <label htmlFor="ticketLink">Lien du billet (facultatif):</label>
+              <input
+                id="ticketLink"
+                type="text"
+                value={ticketLink}
+                onChange={(e) => setTicketLink(e.target.value)}
+                placeholder="Ajoutez un lien vers le billet"
+                className="ticket-link-input"
               />
             </div>
 
