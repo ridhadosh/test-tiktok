@@ -19,7 +19,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
   // Compteurs
-  const [likes, setLikes] = useState(0);
+  const [likes, setLikes] = useState(video.likes || 0);
   const [shares, setShares] = useState(0);
   const [cartAdds, setCartAdds] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -175,13 +175,37 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   /* ------------------------------------------------------------------
      6) Like/Unlike
   ------------------------------------------------------------------ */
-  const toggleLike = () => {
-    setIsLiked((prev) => {
-      const newState = !prev;
-      setLikes((l) => (newState ? l + 1 : l - 1));
-      return newState;
-    });
-  };
+   /* ------------------------------------------------------------------
+     6) Like/Unlike – Mise à jour via l'API pour persister en DB
+  ------------------------------------------------------------------ */
+  const toggleLike = async () => {
+    try {
+      // Choisir l'endpoint en fonction de l'état actuel
+      const endpoint = isLiked
+        ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
+        : 'https://exhib1t.com/wp-json/tiktok/v1/like';
+  
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoId: video.id }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update like count');
+      }
+  
+      const data = await response.json();
+  
+      // Mettre à jour le nombre de likes et basculer l'état
+      setLikes(data.likes);
+      setIsLiked(!isLiked);
+    } catch (err) {
+      console.error(err);
+    }
+  };  
 
   /* ------------------------------------------------------------------
      7) Ouvrir/fermer manuellement la sidebar Comments
