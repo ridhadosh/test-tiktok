@@ -175,3 +175,14 @@
   box-sizing: border-box;
 }
 
+.title-wrapper {
+  margin-top: 1rem;
+}
+
+.video-title-input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1.25rem; /* Taille de police plus grande pour le titre */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

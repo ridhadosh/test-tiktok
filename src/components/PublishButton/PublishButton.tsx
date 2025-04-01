@@ -9,10 +9,11 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ticketLink, setTicketLink] = useState('');
 
-  // Nettoyage de l'URL de preview quand on change de fichier ou démonte le composant
+  // Nettoyage de l'URL de preview lors du changement de fichier ou au démontage
   useEffect(() => {
     return () => {
       if (previewURL) {
@@ -29,7 +30,6 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      // On révoque l'ancienne preview si elle existe, puis on crée la nouvelle
       if (previewURL) {
         URL.revokeObjectURL(previewURL);
       }
@@ -45,10 +45,11 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
     const formData = new FormData();
     formData.append('video', selectedFile);
+    formData.append('title', title);
     formData.append('description', description);
+    formData.append('ticketLink', ticketLink);
 
     try {
-      // Appel vers l’endpoint WordPress
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
         method: 'POST',
         body: formData,
@@ -58,18 +59,15 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       const data = await response.json();
       console.log('Upload success:', data);
 
-      // Fermer la modale, réinitialiser le formulaire
       setShowModal(false);
       setSelectedFile(null);
       setPreviewURL(null);
+      setTitle('');
       setDescription('');
+      setTicketLink('');
 
-      // Callback parent
       onUploadSuccess();
-
-      // Optionnel: recharger la page pour forcer un refresh
       window.location.reload();
-
     } catch (error) {
       console.error(error);
       alert('Something went wrong during upload!');
@@ -115,7 +113,20 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               />
             )}
 
-            {/* Champ description */}
+            {/* Champ pour le titre */}
+            <div className="title-wrapper" style={{ marginTop: '1rem' }}>
+              <label htmlFor="videoTitle">Titre :</label>
+              <input
+                id="videoTitle"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Entrez le titre de la vidéo"
+                className="video-title-input"
+              />
+            </div>
+
+            {/* Champ pour la description */}
             <div className="description-wrapper" style={{ marginTop: '1rem' }}>
               <label htmlFor="videoDescription">Description (facultatif):</label>
               <textarea
@@ -126,7 +137,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               />
             </div>
             
-            {/* Champ pour le lien du ticket */}
+            {/* Champ pour le lien du billet */}
             <div className="ticket-link-wrapper" style={{ marginTop: '1rem' }}>
               <label htmlFor="ticketLink">Lien du billet (facultatif):</label>
               <input

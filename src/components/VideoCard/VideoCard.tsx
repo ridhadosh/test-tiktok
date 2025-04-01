@@ -33,7 +33,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  // NEW STATES: For more menu and admin status
+  // NEW STATES: For More menu and admin status
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -45,9 +45,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/check-admin', {
         credentials: 'include'
       });
-      
       if (!response.ok) throw new Error('Failed to check admin status');
-      
       const data = await response.json();
       setIsAdmin(data.isAdmin);
     } catch (error) {
@@ -63,18 +61,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     if (!window.confirm('Are you sure you want to delete this video permanently?')) {
       return;
     }
-
     try {
       const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/videos/${video.id}`, {
         method: 'DELETE',
         credentials: 'include'
       });
-
       if (!response.ok) throw new Error('Failed to delete video');
-      
       alert('Video deleted successfully');
       window.location.reload();
-      
     } catch (error) {
       console.error('Error deleting video:', error);
       alert('Failed to delete video. You may not have permission.');
@@ -84,7 +78,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const handleCartClick = () => {
     setIsCartModalOpen(true);
   };
-  
 
   // État pour la fenêtre de partage
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -141,7 +134,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         setManualOverride(false);
       }
     }, { threshold: 0.7 });
-
     if (containerRef.current) observer.observe(containerRef.current);
     return () => {
       if (containerRef.current) observer.unobserve(containerRef.current);
@@ -163,7 +155,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         setIsPlaying(false);
       }
     }, { threshold: 0.7 });
-
     if (videoRef.current) playObserver.observe(videoRef.current);
     return () => {
       if (videoRef.current) playObserver.unobserve(videoRef.current);
@@ -176,7 +167,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   useEffect(() => {
     if (!videoRef.current) return;
     const videoEl = videoRef.current;
-
     function handleMetadata() {
       const { videoWidth, videoHeight } = videoEl;
       if (videoHeight > videoWidth) {
@@ -187,7 +177,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         videoEl.classList.remove('vertical-video');
       }
     }
-
     videoEl.addEventListener('loadedmetadata', handleMetadata);
     return () => {
       videoEl.removeEventListener('loadedmetadata', handleMetadata);
@@ -199,13 +188,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   ------------------------------------------------------------------ */
   const handleVideoPress = () => {
     if (!videoRef.current) return;
-    // Mettre en pause les autres vidéos
     const allVideos = document.querySelectorAll('video');
     allVideos.forEach((vid) => {
       if (vid !== videoRef.current) vid.pause();
     });
-
-    // Lecture/pause
     if (isPlaying) {
       videoRef.current.pause();
       setShowControlIcon('pause');
@@ -214,24 +200,17 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       setShowControlIcon('play');
     }
     setIsPlaying(!isPlaying);
-
-    // Icône disparaît après 700ms
     setTimeout(() => setShowControlIcon(null), 700);
   };
 
   /* ------------------------------------------------------------------
-     6) Like/Unlike
-  ------------------------------------------------------------------ */
-   /* ------------------------------------------------------------------
      6) Like/Unlike – Mise à jour via l'API pour persister en DB
   ------------------------------------------------------------------ */
   const toggleLike = async () => {
     try {
-      // Choisir l'endpoint en fonction de l'état actuel
       const endpoint = isLiked
         ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
         : 'https://exhib1t.com/wp-json/tiktok/v1/like';
-  
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -239,20 +218,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         },
         body: JSON.stringify({ videoId: video.id }),
       });
-  
       if (!response.ok) {
         throw new Error('Failed to update like count');
       }
-  
       const data = await response.json();
-  
-      // Mettre à jour le nombre de likes et basculer l'état
       setLikes(data.likes);
       setIsLiked(!isLiked);
     } catch (err) {
       console.error(err);
     }
-  };  
+  };
 
   /* ------------------------------------------------------------------
      7) Ouvrir/fermer manuellement la sidebar Comments
@@ -307,20 +282,17 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
     alert('Link copied!');
-    setShares((prev) => prev + 1); // 🔥 Incrémente uniquement après copie
+    setShares((prev) => prev + 1);
   };
   
   const handleClickSocial = (url: string) => {
     window.open(url, '_blank');
-    setShares((prev) => prev + 1); // 🔥 Incrémente uniquement après un vrai clic
+    setShares((prev) => prev + 1);
   };
-
 
   // --------------------------------------------
   // -- FAVORIS --
   // --------------------------------------------
-
-  // Au montage, vérifier si cette vidéo est déjà dans les favoris (stockés en localStorage)
   useEffect(() => {
     const storedFavs = localStorage.getItem('favorites');
     const favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
@@ -332,13 +304,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const toggleFavorite = () => {
     const storedFavs = localStorage.getItem('favorites');
     let favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
-
     if (favIds.includes(video.id)) {
-      // Retirer des favoris
       favIds = favIds.filter((id) => id !== video.id);
       setIsFavorited(false);
     } else {
-      // Ajouter
       favIds.push(video.id);
       setIsFavorited(true);
     }
@@ -366,60 +335,55 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         )}
 
-        {/* Les icônes (Profil, Like, Comment, Share, Cart, Fav) */}
+        {/* Icônes d'actions (Profil, Like, Comment, Share, Cart, Fav, More) */}
         <div className="video-card__actions">
-          {/* Profil */}
           <div className="action-container profile-container" onClick={() => setIsProfileModalOpen(true)}>
-            <img
-              src={defaultProfile}
-              alt="Profil"
-              className="profile-icon"
-            />
+            <img src={defaultProfile} alt="Profil" className="profile-icon" />
           </div>
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
             <span className="counter">{likes}</span>
           </div>
-
-          {/* Comment */}
           <div className="action-container" onClick={toggleComments}>
             <i className="fa fa-comment action-btn"></i>
             <span className="counter">{commentsCount}</span>
           </div>
-
-          {/* Share */}
           <div className="action-container" onClick={toggleShareModal}>
             <i className="fa fa-share action-btn"></i>
             <span className="counter">{shares}</span>
           </div>
-
           <div className="action-container" onClick={handleCartClick}>
             <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">{cartAdds}</span>
           </div>
-
-          {/* Favoris */}
           <div className="action-container" onClick={toggleFavorite}>
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
             <span className="counter">Fav</span>
           </div>
-
-          {/* NEW: More options (three dots) */}
           <div className="action-container" onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}>
             <i className="fa fa-ellipsis-h action-btn"></i>
             <span className="counter">More</span>
           </div>
         </div>
 
-        {/* Description overlay */}
-        {video.description && (
-          <div className="video-description-overlay">
-            {video.description}
+        {/* Nouvelle overlay pour afficher titre et description */}
+        {(video.title || video.description) && (
+          <div className="video-overlay">
+            {video.title && (
+              <div className="video-title-overlay">
+                {video.title}
+              </div>
+            )}
+            {video.description && (
+              <div className="video-description-overlay">
+                {video.description}
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {/* ------------------- MODALE DU PROFIL ------------------- */}
+      {/* Modale de profil */}
       {isProfileModalOpen && (
         <div className="cart-modal" onClick={() => setIsProfileModalOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
@@ -430,7 +394,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       )}
 
-      {/* ------------------- SIDEBAR DE COMMENTAIRES ------------------- */}
+      {/* Sidebar de commentaires */}
       {isCommentOpen && (
         <div className="comment-modal" onClick={() => setIsCommentOpen(false)}>
           <div className="comment-container" onClick={(e) => e.stopPropagation()}>
@@ -469,34 +433,23 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           <div className="share-container" onClick={(e) => e.stopPropagation()}>
             <h2>Share to</h2>
             <div className="share-link-container">
-              <input
-                type="text"
-                readOnly
-                value={shareLink}
-                className="share-link"
-              />
+              <input type="text" readOnly value={shareLink} className="share-link" />
               <button className="copy-btn" onClick={handleCopyLink}>Copy</button>
             </div>
             <div className="share-options-grid">
               {shareOptions.map((option) => (
-                <div
-                  key={option.name}
-                  className="share-option"
-                  onClick={() => handleClickSocial(option.link)}
-                >
+                <div key={option.name} className="share-option" onClick={() => handleClickSocial(option.link)}>
                   <i className={option.icon}></i>
                   <span>{option.name}</span>
                 </div>
               ))}
             </div>
-            <button className="close-btn" onClick={() => setIsShareOpen(false)}>
-              ✕
-            </button>
+            <button className="close-btn" onClick={() => setIsShareOpen(false)}>✕</button>
           </div>
         </div>
       )}
 
-      {/* ------------------- MODALE DU PANIER ------------------- */}
+      {/* Modale du panier */}
       {isCartModalOpen && (
         <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
@@ -507,7 +460,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       )}
 
-      {/* NEW: More Options Menu */}
+      {/* Modale More options */}
       {isMoreMenuOpen && (
         <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
           <div className="more-container" onClick={(e) => e.stopPropagation()}>
@@ -515,24 +468,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <button className="more-option" onClick={toggleFavorite}>
               {isFavorited ? 'Remove from favorites' : 'Add to favorites'}
             </button>
-            
             {isAdmin && (
               <>
                 <div className="more-separator"></div>
-                <button 
-                  className="more-option delete-option"
-                  onClick={handleDeleteVideo}
-                >
+                <button className="more-option delete-option" onClick={handleDeleteVideo}>
                   Delete Video (Admin)
                 </button>
               </>
             )}
-            
             <div className="more-separator"></div>
-            <button 
-              className="more-option close-option"
-              onClick={() => setIsMoreMenuOpen(false)}
-            >
+            <button className="more-option close-option" onClick={() => setIsMoreMenuOpen(false)}>
               Close
             </button>
           </div>
