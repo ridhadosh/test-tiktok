@@ -10,8 +10,8 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
 
-  // -- NOUVEAU CHAMPS --
-  const [title, setTitle] = useState('');          // Titre
+  // NOUVEAUX CHAMPS
+  const [title, setTitle] = useState('');            // Titre
   const [description, setDescription] = useState('');  // Description
   const [ticketLink, setTicketLink] = useState('');    // Lien du billet
 
@@ -47,13 +47,12 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
     const formData = new FormData();
     formData.append('video', selectedFile);
 
-    // Ajout des champs titre/description/ticketLink
+    // Ajout des champs titre, description et ticketLink
     formData.append('title', title);
     formData.append('description', description);
     formData.append('ticketLink', ticketLink);
 
     try {
-      // URL de l'endpoint WordPress pour l'upload
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
         method: 'POST',
         body: formData,
@@ -63,6 +62,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       const data = await response.json();
       console.log('Upload success:', data);
 
+      // Réinitialisation et fermeture de la modale
       setShowModal(false);
       setSelectedFile(null);
       setPreviewURL(null);
@@ -71,8 +71,6 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       setTicketLink('');
 
       onUploadSuccess();
-
-      // Forcer le refresh de la page ou re-fetch
       window.location.reload();
 
     } catch (error) {

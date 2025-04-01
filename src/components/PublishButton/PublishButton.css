@@ -197,3 +197,27 @@
   font-size: 1rem; /* un peu plus petit que la description si vous le souhaitez */
   box-sizing: border-box;
 }
+
+/* Lien du billet */
+.ticket-link-wrapper {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-link-wrapper label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.ticket-link-input {
+  width: 100%;
+  min-height: 60px; /* Taille similaire au titre */
+  resize: none;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;  /* Vous pouvez ajuster la taille si nécessaire */
+  box-sizing: border-box;
+}
