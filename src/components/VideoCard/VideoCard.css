@@ -67,6 +67,11 @@
   color: #fff;  
   text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6); /* Adds depth to make icons visible */
   transition: color 0.2s, transform 0.2s;
+  display: flex; /* Ensure the icon container is flexible */
+  align-items: center;
+  justify-content: center;
+  width: auto;  /* Remove fixed dimensions that might force a square */
+  height: auto;
 }
 
 /* Like effect */
@@ -282,9 +287,9 @@
   top: 12px;
   right: 12px;
   border: none;
-  background: transparent;
   font-size: 1.2rem;
   cursor: pointer;
+  background: #000000;
 }
 
 /* Lien à copier */
@@ -433,4 +438,61 @@
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 10px;
+}
+/* ================== MORE OPTIONS MODAL ================== */
+.more-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.more-container {
+  background: #fff;
+  border-radius: 12px;
+  width: 250px;
+  max-width: 90%;
+  padding: 0.5rem 0;
+  position: relative;
+  animation: fadeInUp 0.2s ease forwards;
+}
+
+.more-option {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.more-option:hover {
+  background-color: #f5f5f5;
+}
+
+.delete-option {
+  color: #ff0000;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  margin: 5px 0;
+}
+
+.close-option {
+  color: #888;
+  font-weight: bold;
+}
+
+.more-separator {
+  height: 1px;
+  background-color: #eee;
+  margin: 5px 0;
 }

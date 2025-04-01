@@ -7,7 +7,7 @@ import { VideoData } from '../../types';
 let globalCommentsDisabled = false;
 
 interface VideoCardProps {
-  video: VideoData; // video: { id, src, description?, etc. }
+  video: VideoData;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
@@ -19,7 +19,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
   // Compteurs
-  const [likes, setLikes] = useState(0);
+  const [likes, setLikes] = useState(video.likes || 0);
   const [shares, setShares] = useState(0);
   const [cartAdds, setCartAdds] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
@@ -33,6 +33,53 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
+  // NEW STATES: For more menu and admin status
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  /* ------------------------------------------------------------------
+     NEW FUNCTION: Check if user is admin
+  ------------------------------------------------------------------ */
+  const checkAdminStatus = async () => {
+    try {
+      const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/check-admin', {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) throw new Error('Failed to check admin status');
+      
+      const data = await response.json();
+      setIsAdmin(data.isAdmin);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    }
+  };
+
+  /* ------------------------------------------------------------------
+     NEW FUNCTION: Delete video (admin only)
+  ------------------------------------------------------------------ */
+  const handleDeleteVideo = async () => {
+    if (!window.confirm('Are you sure you want to delete this video permanently?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/videos/${video.id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error('Failed to delete video');
+      
+      alert('Video deleted successfully');
+      window.location.reload();
+      
+    } catch (error) {
+      console.error('Error deleting video:', error);
+      alert('Failed to delete video. You may not have permission.');
+    }
+  };
 
   const handleCartClick = () => {
     setIsCartModalOpen(true);
@@ -175,13 +222,37 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   /* ------------------------------------------------------------------
      6) Like/Unlike
   ------------------------------------------------------------------ */
-  const toggleLike = () => {
-    setIsLiked((prev) => {
-      const newState = !prev;
-      setLikes((l) => (newState ? l + 1 : l - 1));
-      return newState;
-    });
-  };
+   /* ------------------------------------------------------------------
+     6) Like/Unlike – Mise à jour via l'API pour persister en DB
+  ------------------------------------------------------------------ */
+  const toggleLike = async () => {
+    try {
+      // Choisir l'endpoint en fonction de l'état actuel
+      const endpoint = isLiked
+        ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
+        : 'https://exhib1t.com/wp-json/tiktok/v1/like';
+  
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videoId: video.id }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update like count');
+      }
+  
+      const data = await response.json();
+  
+      // Mettre à jour le nombre de likes et basculer l'état
+      setLikes(data.likes);
+      setIsLiked(!isLiked);
+    } catch (err) {
+      console.error(err);
+    }
+  };  
 
   /* ------------------------------------------------------------------
      7) Ouvrir/fermer manuellement la sidebar Comments
@@ -299,12 +370,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         <div className="video-card__actions">
           {/* Profil */}
           <div className="action-container profile-container" onClick={() => setIsProfileModalOpen(true)}>
-          <img
-            src={defaultProfile}
-            alt="Profil"
-            className="profile-icon"
-          />
-        </div>
+            <img
+              src={defaultProfile}
+              alt="Profil"
+              className="profile-icon"
+            />
+          </div>
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
             <span className="counter">{likes}</span>
@@ -322,7 +393,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <span className="counter">{shares}</span>
           </div>
 
-            <div className="action-container" onClick={handleCartClick}>
+          <div className="action-container" onClick={handleCartClick}>
             <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">{cartAdds}</span>
           </div>
@@ -332,9 +403,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
             <span className="counter">Fav</span>
           </div>
+
+          {/* NEW: More options (three dots) */}
+          <div className="action-container" onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}>
+            <i className="fa fa-ellipsis-h action-btn"></i>
+            <span className="counter">More</span>
+          </div>
         </div>
 
-         {/* Description overlay */}
+        {/* Description overlay */}
         {video.description && (
           <div className="video-description-overlay">
             {video.description}
@@ -342,7 +419,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         )}
       </div>
 
-        {/* ------------------- MODALE DU PROFIL ------------------- */}
+      {/* ------------------- MODALE DU PROFIL ------------------- */}
       {isProfileModalOpen && (
         <div className="cart-modal" onClick={() => setIsProfileModalOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
@@ -352,7 +429,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         </div>
       )}
-
 
       {/* ------------------- SIDEBAR DE COMMENTAIRES ------------------- */}
       {isCommentOpen && (
@@ -419,16 +495,49 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         </div>
       )}
-          {/* ------------------- MODALE DU PANIER ------------------- */}
-    {isCartModalOpen && (
-      <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
-        <div className="cart-container" onClick={(e) => e.stopPropagation()}>
-          <h2>🎟 Ajouter au panier</h2>
-          <p>Ici il faut mettre la route vers le billet</p>
-          <button className="close-btn" onClick={() => setIsCartModalOpen(false)}>✕</button>
+
+      {/* ------------------- MODALE DU PANIER ------------------- */}
+      {isCartModalOpen && (
+        <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
+          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+            <h2>🎟 Ajouter au panier</h2>
+            <p>Ici il faut mettre la route vers le billet</p>
+            <button className="close-btn" onClick={() => setIsCartModalOpen(false)}>✕</button>
+          </div>
         </div>
-      </div>
-    )}
+      )}
+
+      {/* NEW: More Options Menu */}
+      {isMoreMenuOpen && (
+        <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
+          <div className="more-container" onClick={(e) => e.stopPropagation()}>
+            <button className="more-option">Report</button>
+            <button className="more-option" onClick={toggleFavorite}>
+              {isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+            </button>
+            
+            {isAdmin && (
+              <>
+                <div className="more-separator"></div>
+                <button 
+                  className="more-option delete-option"
+                  onClick={handleDeleteVideo}
+                >
+                  Delete Video (Admin)
+                </button>
+              </>
+            )}
+            
+            <div className="more-separator"></div>
+            <button 
+              className="more-option close-option"
+              onClick={() => setIsMoreMenuOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
