@@ -9,11 +9,12 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [ticketLink, setTicketLink] = useState('');
 
-  // Nettoyage de l'URL de preview lors du changement de fichier ou au démontage
+  // -- NOUVEAU CHAMPS --
+  const [title, setTitle] = useState('');          // Titre
+  const [description, setDescription] = useState('');  // Description
+  const [ticketLink, setTicketLink] = useState('');    // Lien du billet
+
   useEffect(() => {
     return () => {
       if (previewURL) {
@@ -45,11 +46,14 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
     const formData = new FormData();
     formData.append('video', selectedFile);
+
+    // Ajout des champs titre/description/ticketLink
     formData.append('title', title);
     formData.append('description', description);
     formData.append('ticketLink', ticketLink);
 
     try {
+      // URL de l'endpoint WordPress pour l'upload
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
         method: 'POST',
         body: formData,
@@ -67,7 +71,10 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       setTicketLink('');
 
       onUploadSuccess();
+
+      // Forcer le refresh de la page ou re-fetch
       window.location.reload();
+
     } catch (error) {
       console.error(error);
       alert('Something went wrong during upload!');
@@ -113,12 +120,11 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               />
             )}
 
-            {/* Champ pour le titre */}
+            {/* Titre */}
             <div className="title-wrapper" style={{ marginTop: '1rem' }}>
               <label htmlFor="videoTitle">Titre :</label>
-              <input
+              <textarea
                 id="videoTitle"
-                type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Entrez le titre de la vidéo"
@@ -126,7 +132,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               />
             </div>
 
-            {/* Champ pour la description */}
+            {/* Description */}
             <div className="description-wrapper" style={{ marginTop: '1rem' }}>
               <label htmlFor="videoDescription">Description (facultatif):</label>
               <textarea
@@ -137,7 +143,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               />
             </div>
             
-            {/* Champ pour le lien du billet */}
+            {/* Lien du billet */}
             <div className="ticket-link-wrapper" style={{ marginTop: '1rem' }}>
               <label htmlFor="ticketLink">Lien du billet (facultatif):</label>
               <input

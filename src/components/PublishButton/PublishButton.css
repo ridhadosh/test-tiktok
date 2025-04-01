@@ -177,12 +177,23 @@
 
 .title-wrapper {
   margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.title-wrapper label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .video-title-input {
   width: 100%;
+  min-height: 60px; /* plus petit que la description */
+  resize: none;
   padding: 0.5rem;
-  font-size: 1.25rem; /* Taille de police plus grande pour le titre */
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem; /* un peu plus petit que la description si vous le souhaitez */
+  box-sizing: border-box;
 }
