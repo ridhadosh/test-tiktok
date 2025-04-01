@@ -313,6 +313,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
     localStorage.setItem('favorites', JSON.stringify(favIds));
   };
+  useEffect(() => {
+    checkAdminStatus();
+  }, []);
 
   return (
     <div ref={containerRef} className="video-card">

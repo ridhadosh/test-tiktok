@@ -289,7 +289,7 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  background: #000000;
+  background: #ff0000;
 }
 
 /* Lien à copier */
@@ -491,18 +491,18 @@
 
 .delete-option {
   color: #ff0000;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  border-top: 1px solid #aaaaaa;
+  border-bottom: 1px solid #aaaaaa;
   margin: 5px 0;
 }
 
 .close-option {
-  color: #888;
+  color: #ff0000;
   font-weight: bold;
 }
 
 .more-separator {
   height: 1px;
-  background-color: #eee;
+  background-color: #a5a5a5;
   margin: 5px 0;
 }
