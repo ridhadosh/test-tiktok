@@ -178,7 +178,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const toggleLike = () => {
     setIsLiked((prev) => {
       const newState = !prev;
-      setLikes((l) => (newState ? l + 0.5 : l - 0.5));
+      setLikes((l) => (newState ? l + 1 : l - 1));
       return newState;
     });
   };
