@@ -10,8 +10,9 @@ const VideoFeed: React.FC = () => {
   // Fonction pour récupérer la liste des vidéos depuis le back-end
   const fetchVideos = async () => {
     try {
-      // Remplace l’URL par ton adresse (avec ou sans proxy)
-      const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/videos');
+      const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/videos?time=${Date.now()}`, {
+        cache: 'no-store'
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch videos');
       }
@@ -34,11 +35,8 @@ const VideoFeed: React.FC = () => {
 
   return (
     <div className="video-feed">
-
-      {/* 
-        Optionnel : si tu veux le bouton ici, tu l’ajoutes
-        <PublishButton onUploadSuccess={handleUploadSuccess} />
-      */}
+      {/* Optionnel : si tu veux le bouton ici, tu l’ajoutes */}
+      {/* <PublishButton onUploadSuccess={handleUploadSuccess} /> */}
       {videos.map((video) => (
         <VideoCard key={video.id} video={video} />
       ))}
