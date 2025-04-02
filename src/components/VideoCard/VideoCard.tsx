@@ -43,9 +43,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const checkAdminStatus = async () => {
     try {
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/check-admin', {
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'X-WP-Nonce': (window as any).wpApiSettings.nonce
+        }
       });
+      
       if (!response.ok) throw new Error('Failed to check admin status');
+      
       const data = await response.json();
       setIsAdmin(data.isAdmin);
     } catch (error) {
@@ -465,27 +470,30 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
       {/* Modale More options */}
       {isMoreMenuOpen && (
-        <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
-          <div className="more-container" onClick={(e) => e.stopPropagation()}>
-            <button className="more-option">Report</button>
-            <button className="more-option" onClick={toggleFavorite}>
-              {isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+      <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
+        <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+          <h4>Options</h4>
+          
+          <button className="more-option">
+            <i className="fa fa-flag"></i> Report
+          </button>
+          
+            <button 
+              className="more-option delete-option"
+              onClick={handleDeleteVideo}
+            >
+              <i className="fa fa-trash"></i> Delete Video
             </button>
-            {isAdmin && (
-              <>
-                <div className="more-separator"></div>
-                <button className="more-option delete-option" onClick={handleDeleteVideo}>
-                  Delete Video (Admin)
-                </button>
-              </>
-            )}
-            <div className="more-separator"></div>
-            <button className="more-option close-option" onClick={() => setIsMoreMenuOpen(false)}>
-              Close
-            </button>
-          </div>
+          
+          <button 
+            className="close-btn" 
+            onClick={() => setIsMoreMenuOpen(false)}
+          >
+            ✕ Close
+          </button>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 };
