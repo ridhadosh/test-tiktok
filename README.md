@@ -3,9 +3,9 @@
 <p align="center"><em>Engage, Share, and Create Your Video Experience</em></p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/last%20commit-last%20friday-blue" />
-  <img src="https://img.shields.io/badge/typescript-60.7%25-blue" />
-  <img src="https://img.shields.io/badge/languages-4-brightgreen" />
+  <img src="https://img.shields.io/github/last-commit/ridhadosh/test-tiktok" />
+  <img src="https://img.shields.io/github/languages/top/ridhadosh/test-tiktok" />
+  <img src="https://img.shields.io/github/languages/count/ridhadosh/test-tiktok" />
 </p>
 
 ---
