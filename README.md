@@ -1,3 +1,32 @@
+<h1 align="center">KOTKIT</h1>
+
+<p align="center"><em>Engage, Share, and Create Your Video Experience</em></p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/last%20commit-last%20friday-blue" />
+  <img src="https://img.shields.io/badge/typescript-60.7%25-blue" />
+  <img src="https://img.shields.io/badge/languages-4-brightgreen" />
+</p>
+
+---
+
+<p align="center"><em>Built with the tools and technologies:</em></p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Express-black?logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/JSON-black?logo=json&logoColor=white" />
+  <img src="https://img.shields.io/badge/npm-%23CB3837.svg?logo=npm&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript-yellow?logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/Nodemon-lightgreen?logo=nodemon&logoColor=white" />
+  <img src="https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Font%20Awesome-339AF0?logo=fontawesome&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS-563D7C?logo=css3&logoColor=white" />
+</p>
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
