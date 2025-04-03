@@ -37,27 +37,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  /* ------------------------------------------------------------------
-     NEW FUNCTION: Check if user is admin
-  ------------------------------------------------------------------ */
-  const checkAdminStatus = async () => {
-    try {
-      const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/check-admin', {
-        credentials: 'include',
-        headers: {
-          'X-WP-Nonce': (window as any).wpApiSettings.nonce
-        }
-      });
-      
-      if (!response.ok) throw new Error('Failed to check admin status');
-      
-      const data = await response.json();
-      setIsAdmin(data.isAdmin);
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-    }
-  };
+
 
   /* ------------------------------------------------------------------
      NEW FUNCTION: Delete video (admin only)
@@ -67,10 +47,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       return;
     }
     try {
-      const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/videos/${video.id}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/delete-video`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: video.id }),
       });
+
       if (!response.ok) throw new Error('Failed to delete video');
       alert('Video deleted successfully');
       window.location.reload();
@@ -78,7 +62,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       console.error('Error deleting video:', error);
       alert('Failed to delete video. You may not have permission.');
     }
-  };
+  };  
 
   const handleCartClick = () => {
     setIsCartModalOpen(true);
@@ -318,9 +302,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
     localStorage.setItem('favorites', JSON.stringify(favIds));
   };
-  useEffect(() => {
-    checkAdminStatus();
-  }, []);
+
 
   return (
     <div ref={containerRef} className="video-card">
