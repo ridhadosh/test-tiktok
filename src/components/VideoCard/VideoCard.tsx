@@ -358,19 +358,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
         {/* Nouvelle overlay pour afficher titre et description */}
         {(video.title || video.description) && (
-          <div className="video-overlay">
-            {video.title && (
-              <div className="video-title-overlay">
-                {video.title}
-              </div>
-            )}
-            {video.description && (
-              <div className="video-description-overlay">
-                {video.description}
-              </div>
-            )}
-          </div>
-        )}
+        <div className="video-overlay">
+          {video.title && (
+            <div className="video-title-overlay">
+              {video.title}
+            </div>
+          )}
+          {video.description && (
+            <div className="video-description-overlay">
+              {video.description}
+            </div>
+          )}
+        </div>
+      )}
       </div>
 
       {/* Modale de profil */}
