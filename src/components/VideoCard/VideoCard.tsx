@@ -196,28 +196,45 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   /* ------------------------------------------------------------------
      6) Like/Unlike – Mise à jour via l'API pour persister en DB
   ------------------------------------------------------------------ */
-  const toggleLike = async () => {
-    try {
-      const endpoint = isLiked
-        ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
-        : 'https://exhib1t.com/wp-json/tiktok/v1/like';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ videoId: video.id }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update like count');
-      }
-      const data = await response.json();
-      setLikes(data.likes);
-      setIsLiked(!isLiked);
-    } catch (err) {
-      console.error(err);
+const toggleLike = async () => {
+  try {
+    // Optimistic update first
+    const wasLiked = isLiked;
+    const newLikes = wasLiked ? likes - 1 : likes + 1;
+    
+    setLikes(newLikes);
+    setIsLiked(!wasLiked);
+
+    const endpoint = wasLiked
+      ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
+      : 'https://exhib1t.com/wp-json/tiktok/v1/like';
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ videoId: video.id }),
+    });
+
+    if (!response.ok) {
+      // Rollback if API call fails
+      setLikes(wasLiked ? likes + 1 : likes - 1);
+      setIsLiked(wasLiked);
+      throw new Error('Failed to update like count');
     }
-  };
+
+    // Optional: Sync with actual server state
+    const data = await response.json();
+    if (data.likes !== newLikes) {
+      setLikes(data.likes);
+    }
+    
+  } catch (err) {
+    console.error(err);
+    alert('Like update failed. Please try again.');
+  }
+};
 
   /* ------------------------------------------------------------------
      7) Ouvrir/fermer manuellement la sidebar Comments
