@@ -221,3 +221,29 @@
   font-size: 1rem;  /* Vous pouvez ajuster la taille si nécessaire */
   box-sizing: border-box;
 }
+
+.group-selector-wrapper {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.group-selector-wrapper label {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.group-selector-wrapper select {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  cursor: pointer;
+}
+
+.group-selector-wrapper select:focus {
+  border-color: #fe2c55;
+  outline: none;
+}
+

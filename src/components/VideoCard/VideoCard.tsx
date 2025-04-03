@@ -36,8 +36,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-
-
   /* ------------------------------------------------------------------
      NEW FUNCTION: Delete video (admin only)
   ------------------------------------------------------------------ */
@@ -61,7 +59,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       console.error('Error deleting video:', error);
       alert('Failed to delete video. You may not have permission.');
     }
-  };  
+  };
 
   const handleCartClick = () => {
     if (video.ticketLink) {
@@ -75,16 +73,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const shareLink = video.src;
   const shareOptions = [
-    { name: 'Repost',         icon: 'fa fa-retweet',      link: '#' },
-    { name: 'Send to friends',icon: 'fa fa-paper-plane',  link: '#' },
-    { name: 'Embed',          icon: 'fa fa-code',         link: '#' },
-    { name: 'WhatsApp',       icon: 'fa fa-whatsapp',     link: 'https://web.whatsapp.com' },
-    { name: 'Facebook',       icon: 'fa fa-facebook',     link: 'https://facebook.com' },
-    { name: 'X',              icon: 'fa fa-twitter',      link: 'https://twitter.com' },
-    { name: 'Telegram',       icon: 'fa fa-telegram',     link: 'https://telegram.org' },
-    { name: 'LinkedIn',       icon: 'fa fa-linkedin',     link: 'https://linkedin.com' },
-    { name: 'Reddit',         icon: 'fa fa-reddit',       link: 'https://reddit.com' },
-    { name: 'Pinterest',      icon: 'fa fa-pinterest',    link: 'https://pinterest.com' },
+    { name: 'Repost', icon: 'fa fa-retweet', link: '#' },
+    { name: 'Send to friends', icon: 'fa fa-paper-plane', link: '#' },
+    { name: 'Embed', icon: 'fa fa-code', link: '#' },
+    { name: 'WhatsApp', icon: 'fa fa-whatsapp', link: 'https://web.whatsapp.com' },
+    { name: 'Facebook', icon: 'fa fa-facebook', link: 'https://facebook.com' },
+    { name: 'X', icon: 'fa fa-twitter', link: 'https://twitter.com' },
+    { name: 'Telegram', icon: 'fa fa-telegram', link: 'https://telegram.org' },
+    { name: 'LinkedIn', icon: 'fa fa-linkedin', link: 'https://linkedin.com' },
+    { name: 'Reddit', icon: 'fa fa-reddit', link: 'https://reddit.com' },
+    { name: 'Pinterest', icon: 'fa fa-pinterest', link: 'https://pinterest.com' },
   ];
 
   // Favoris
@@ -306,7 +304,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     localStorage.setItem('favorites', JSON.stringify(favIds));
   };
 
-
   return (
     <div ref={containerRef} className="video-card">
       <div className="video-wrapper">
@@ -328,7 +325,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         )}
 
-        {/* Icônes d'actions (Profil, Like, Comment, Share, Cart, Fav, More) */}
+        {/* Icônes d'actions (Profil, Like, Comment, Share, Cart, Groupe, Fav, More) */}
         <div className="video-card__actions">
           <div className="action-container profile-container" onClick={() => setIsProfileModalOpen(true)}>
             <img src={defaultProfile} alt="Profil" className="profile-icon" />
@@ -349,6 +346,20 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">Billet</span>
           </div>
+          {/* Bouton pour accéder au groupe via le slug */}
+          {video.groupSlug && (
+            <div className="action-container">
+              <a
+                href={`https://exhib1t.com/groups/${video.groupSlug}`}
+                title="Voir le groupe"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <i className="fa fa-users action-btn"></i>
+                <span className="counter">Groupe</span>
+              </a>
+            </div>
+          )}
           <div className="action-container" onClick={toggleFavorite}>
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
             <span className="counter">Fav</span>
@@ -361,19 +372,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
         {/* Nouvelle overlay pour afficher titre et description */}
         {(video.title || video.description) && (
-        <div className="video-overlay">
-          {video.title && (
-            <div className="video-title-overlay">
-              {video.title}
-            </div>
-          )}
-          {video.description && (
-            <div className="video-description-overlay">
-              {video.description}
-            </div>
-          )}
-        </div>
-      )}
+          <div className="video-overlay">
+            {video.title && (
+              <div className="video-title-overlay">
+                {video.title}
+              </div>
+            )}
+            {video.description && (
+              <div className="video-description-overlay">
+                {video.description}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modale de profil */}
@@ -443,7 +454,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       )}
 
       {/* Modale du panier */}
-      {/* Modale du panier */}
       {isCartModalOpen && (
         <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
@@ -456,30 +466,27 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
       {/* Modale More options */}
       {isMoreMenuOpen && (
-      <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
-        <div className="cart-container" onClick={(e) => e.stopPropagation()}>
-          <h4>Options</h4>
-          
-          <button className="more-option">
-            <i className="fa fa-flag"></i> Report
-          </button>
-          
+        <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
+          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+            <h4>Options</h4>
+            <button className="more-option">
+              <i className="fa fa-flag"></i> Report
+            </button>
             <button 
               className="more-option delete-option"
               onClick={handleDeleteVideo}
             >
               <i className="fa fa-trash"></i> Delete Video
             </button>
-          
-          <button 
-            className="close-btn" 
-            onClick={() => setIsMoreMenuOpen(false)}
-          >
-            ✕ Close
-          </button>
+            <button 
+              className="close-btn" 
+              onClick={() => setIsMoreMenuOpen(false)}
+            >
+              ✕ Close
+            </button>
+          </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 };

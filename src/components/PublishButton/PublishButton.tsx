@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './PublishButton.css';
 
+interface Group {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 interface PublishButtonProps {
   onUploadSuccess: () => void;
 }
@@ -10,10 +16,14 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
 
-  // NOUVEAUX CHAMPS
-  const [title, setTitle] = useState('');            // Titre
-  const [description, setDescription] = useState('');  // Description
-  const [ticketLink, setTicketLink] = useState('');    // Lien du billet
+  // Champs existants
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [ticketLink, setTicketLink] = useState('');
+
+  // Nouveaux états pour la gestion des groupes
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<string>('');
 
   useEffect(() => {
     return () => {
@@ -22,6 +32,24 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       }
     };
   }, [previewURL]);
+
+  // Récupération des groupes via l'endpoint REST
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/groups');
+        if (response.ok) {
+          const data = await response.json();
+          setGroups(data);
+        } else {
+          console.error("Erreur lors de la récupération des groupes");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchGroups();
+  }, []);
 
   const handlePublish = () => {
     setShowModal(true);
@@ -40,17 +68,20 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      alert('Please select a video file first!');
+      alert('Veuillez sélectionner une vidéo!');
+      return;
+    }
+    if (!selectedGroup) {
+      alert('Veuillez sélectionner un groupe!');
       return;
     }
 
     const formData = new FormData();
     formData.append('video', selectedFile);
-
-    // Ajout des champs titre, description et ticketLink
     formData.append('title', title);
     formData.append('description', description);
     formData.append('ticketLink', ticketLink);
+    formData.append('groupId', selectedGroup);
 
     try {
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
@@ -69,13 +100,14 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       setTitle('');
       setDescription('');
       setTicketLink('');
+      setSelectedGroup('');
 
       onUploadSuccess();
       window.location.reload();
 
     } catch (error) {
       console.error(error);
-      alert('Something went wrong during upload!');
+      alert('Erreur lors de l\'upload!');
     }
   };
 
@@ -102,9 +134,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
                 onChange={handleFileChange}
                 style={{ display: 'none' }}
               />
-              {selectedFile && (
-                <span className="file-name">{selectedFile.name}</span>
-              )}
+              {selectedFile && <span className="file-name">{selectedFile.name}</span>}
             </div>
 
             {/* Preview vidéo */}
@@ -132,7 +162,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
 
             {/* Description */}
             <div className="description-wrapper" style={{ marginTop: '1rem' }}>
-              <label htmlFor="videoDescription">Description (facultatif):</label>
+              <label htmlFor="videoDescription">Description (facultatif) :</label>
               <textarea
                 id="videoDescription"
                 value={description}
@@ -143,7 +173,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
             
             {/* Lien du billet */}
             <div className="ticket-link-wrapper" style={{ marginTop: '1rem' }}>
-              <label htmlFor="ticketLink">Lien du billet (facultatif):</label>
+              <label htmlFor="ticketLink">Lien du billet (facultatif) :</label>
               <input
                 id="ticketLink"
                 type="text"
@@ -153,6 +183,24 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
                 className="ticket-link-input"
               />
             </div>
+
+            {/* Sélection du groupe */}
+            <div className="group-selector-wrapper">
+              <label htmlFor="groupSelect">Sélectionnez un groupe :</label>
+              <select
+                id="groupSelect"
+                value={selectedGroup}
+                onChange={(e) => setSelectedGroup(e.target.value)}
+              >
+                <option value="">Choisissez un groupe</option>
+                {groups.map((group) => (
+                  <option key={group.id} value={group.id}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
 
             <div className="button-row">
               <button className="cancel-btn" onClick={() => setShowModal(false)}>
