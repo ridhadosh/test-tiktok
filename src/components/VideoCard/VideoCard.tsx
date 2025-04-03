@@ -30,7 +30,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [manualOverride, setManualOverride] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   // NEW STATES: For More menu and admin status
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
@@ -291,7 +290,7 @@ const toggleLike = async () => {
     alert('Link copied!');
     setShares((prev) => prev + 1);
   };
-  
+
   const handleClickSocial = (url: string) => {
     window.open(url, '_blank');
     setShares((prev) => prev + 1);
@@ -342,10 +341,21 @@ const toggleLike = async () => {
           </div>
         )}
 
-        {/* Icônes d'actions (Profil, Like, Comment, Share, Cart, Groupe, Fav, More) */}
+        {/* Icônes d'actions (Groupe, Like, Comment, Share, Cart, Fav, More) */}
         <div className="video-card__actions">
-          <div className="action-container profile-container" onClick={() => setIsProfileModalOpen(true)}>
-            <img src={defaultProfile} alt="Profil" className="profile-icon" />
+          <div className="action-container profile-container">
+            {video.groupSlug ? (
+              <a
+                href={`https://exhib1t.com/groups/${video.groupSlug}`}
+                title="Voir le groupe"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img src={defaultProfile} alt="Groupe" className="profile-icon" />
+              </a>
+            ) : (
+              <img src={defaultProfile} alt="Profil" className="profile-icon" />
+            )}
           </div>
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
@@ -363,20 +373,6 @@ const toggleLike = async () => {
             <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">Billet</span>
           </div>
-          {/* Bouton pour accéder au groupe via le slug */}
-          {video.groupSlug && (
-            <div className="action-container">
-              <a
-                href={`https://exhib1t.com/groups/${video.groupSlug}`}
-                title="Voir le groupe"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <i className="fa fa-users action-btn"></i>
-                <span className="counter">Groupe</span>
-              </a>
-            </div>
-          )}
           <div className="action-container" onClick={toggleFavorite}>
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
             <span className="counter">Fav</span>
@@ -403,17 +399,6 @@ const toggleLike = async () => {
           </div>
         )}
       </div>
-
-      {/* Modale de profil */}
-      {isProfileModalOpen && (
-        <div className="cart-modal" onClick={() => setIsProfileModalOpen(false)}>
-          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
-            <h2>👤 Profil Utilisateur</h2>
-            <p>Ici il faut ouvrir le profile d'utilisateur</p>
-            <button className="close-btn" onClick={() => setIsProfileModalOpen(false)}>✕</button>
-          </div>
-        </div>
-      )}
 
       {/* Sidebar de commentaires */}
       {isCommentOpen && (
