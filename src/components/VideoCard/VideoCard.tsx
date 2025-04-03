@@ -21,7 +21,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   // Compteurs
   const [likes, setLikes] = useState(video.likes || 0);
   const [shares, setShares] = useState(0);
-  const [cartAdds, setCartAdds] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
   // Commentaires
@@ -65,7 +64,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   };  
 
   const handleCartClick = () => {
-    setIsCartModalOpen(true);
+    if (video.ticketLink) {
+      window.open(video.ticketLink, '_blank');
+    } else {
+      setIsCartModalOpen(true);
+    }
   };
 
   // État pour la fenêtre de partage
@@ -344,7 +347,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
           <div className="action-container" onClick={handleCartClick}>
             <i className="fa fa-shopping-cart action-btn"></i>
-            <span className="counter">{cartAdds}</span>
+            <span className="counter">Billet</span>
           </div>
           <div className="action-container" onClick={toggleFavorite}>
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
@@ -394,7 +397,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             </div>
             <div className="comment-list">
               {commentsList.length === 0 ? (
-                <p>🚀 No comments yet. Be the first!</p>
+                <p>🚀 Aucun commentaire pour le moment. Soyez le premier!</p>
               ) : (
                 commentsList.map((comment) => (
                   <div key={comment.id} style={{ marginBottom: '1rem' }}>
@@ -440,11 +443,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       )}
 
       {/* Modale du panier */}
+      {/* Modale du panier */}
       {isCartModalOpen && (
         <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
-            <h2>🎟 Ajouter au panier</h2>
-            <p>Ici il faut mettre la route vers le billet</p>
+            <h2>🎟 Billetterie</h2>
+            <p>Le lien d'achat des billets n'est pas encore disponible.</p>
             <button className="close-btn" onClick={() => setIsCartModalOpen(false)}>✕</button>
           </div>
         </div>

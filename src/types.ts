@@ -4,5 +4,6 @@ export interface VideoData {
   title?: string;           // Optional title
   productLink?: string;     // Optional product link
   description?: string;     // Optional description field
-  likes?: number;    
+  likes?: number;
+  ticketLink?: string;
 }
