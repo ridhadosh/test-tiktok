@@ -101,6 +101,26 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
   };
 
+  useEffect(() => {
+    async function fetchLikeStatus() {
+      try {
+        const response = await fetch(
+          `https://exhib1t.com/wp-json/tiktok/v1/like/status?videoId=${video.id}`,
+          { credentials: 'include' }
+        );
+        if (!response.ok) throw new Error('Network error');
+        const data = await response.json();
+        // Expecting backend to return { liked: true/false }
+        setIsLiked(data.liked);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchLikeStatus();
+  }, [video.id]);
+
+
+
   /* ------------------------------------------------------------------
      2) Mettre à jour le nombre de commentaires quand la liste change
   ------------------------------------------------------------------ */
@@ -205,14 +225,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ videoId: video.id }),
       });
-      if (!response.ok) {
-        throw new Error('Failed to update like count');
-      }
+      if (!response.ok) throw new Error('Failed to update like count');
       const data = await response.json();
+      // Expecting backend to return updated likes count and new like status like: { likes: number, liked: boolean }
       setLikes(data.likes);
-      setIsLiked(!isLiked);
+      setIsLiked(data.liked);
     } catch (err) {
       console.error(err);
     }
