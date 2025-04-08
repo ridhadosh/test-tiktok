@@ -250,6 +250,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ user: 'Anonymous', text: commentText }),
       });
       if (!res.ok) throw new Error('Failed to post comment');
