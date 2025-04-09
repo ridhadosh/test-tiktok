@@ -347,20 +347,24 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
         {/* Icônes d'actions (Groupe, Like, Comment, Share, Cart, Fav, More) */}
         <div className="video-card__actions">
-          <div className="action-container profile-container">
-            {video.groupSlug ? (
-              <a
-                href={`https://exhib1t.com/groups/${video.groupSlug}`}
-                title="Voir le groupe"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={defaultProfile} alt="Groupe" className="profile-icon" />
-              </a>
-            ) : (
-              <img src={defaultProfile} alt="Profil" className="profile-icon" />
-            )}
-          </div>
+          <div 
+              className={`action-container profile-container ${video.group_slug ? 'clickable' : ''}`} 
+              onClick={(e) => {
+                e.stopPropagation();
+                console.log('Clicked on profile icon. video.group_slug:', video.group_slug);
+                if (video.group_slug) {
+                  window.open(`https://exhib1t.com/groups/${video.group_slug}`, '_blank');
+                }
+              }}
+            >
+              <div className="profile-link">
+                <img 
+                  src={defaultProfile} 
+                  alt={video.group_slug ? "Groupe" : "Profil"} 
+                  className="profile-icon" 
+                />
+              </div>
+            </div>
           <div className="action-container" onClick={toggleLike}>
             <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
             <span className="counter">{likes}</span>

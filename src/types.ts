@@ -6,5 +6,5 @@ export interface VideoData {
   description?: string;     // Optional description field
   likes?: number;
   ticketLink?: string;
-  groupSlug?: string;   
+  group_slug?: string;   
 }
