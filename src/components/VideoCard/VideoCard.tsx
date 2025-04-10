@@ -18,10 +18,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
-  // Compteurs
+  // Compteurs et like
   const [likes, setLikes] = useState(video.likes || 0);
   const [shares, setShares] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [loadingLike, setLoadingLike] = useState(false);
 
   // Commentaires
   const [commentsList, setCommentsList] = useState<any[]>([]);
@@ -30,8 +31,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [manualOverride, setManualOverride] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [loadingComments, setLoadingComments] = useState(false);
 
-  // NEW STATES: For More menu and admin status
+  // NEW STATES: For More menu (and admin status, if needed)
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -45,12 +47,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     try {
       const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/delete-video`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: video.id }),
       });
-
       if (!response.ok) throw new Error('Failed to delete video');
       alert('Video deleted successfully');
       window.location.reload();
@@ -91,6 +90,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
      1) Charger les commentaires pour cette vidéo
   ------------------------------------------------------------------ */
   const fetchComments = async () => {
+    setLoadingComments(true);
     try {
       const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`);
       if (!res.ok) throw new Error('Failed to fetch comments');
@@ -98,11 +98,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       setCommentsList(data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoadingComments(false);
     }
   };
 
   useEffect(() => {
     async function fetchLikeStatus() {
+      setLoadingLike(true);
       try {
         const response = await fetch(
           `https://exhib1t.com/wp-json/tiktok/v1/like/status?videoId=${video.id}`,
@@ -114,12 +117,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         setIsLiked(data.liked);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoadingLike(false);
       }
     }
     fetchLikeStatus();
   }, [video.id]);
-
-
 
   /* ------------------------------------------------------------------
      2) Mettre à jour le nombre de commentaires quand la liste change
@@ -216,25 +219,28 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
      6) Like/Unlike – Mise à jour via l'API pour persister en DB
   ------------------------------------------------------------------ */
   const toggleLike = async () => {
+    // If already liked, do nothing
+    if (isLiked) {
+      return;
+    }
+    setLoadingLike(true);
     try {
-      const endpoint = isLiked
-        ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
-        : 'https://exhib1t.com/wp-json/tiktok/v1/like';
+      const endpoint = 'https://exhib1t.com/wp-json/tiktok/v1/like';
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ videoId: video.id }),
       });
       if (!response.ok) throw new Error('Failed to update like count');
       const data = await response.json();
-      // Expecting backend to return updated likes count and new like status like: { likes: number, liked: boolean }
+      // Expect backend to return updated like count and status: { likes: number, liked: true }
       setLikes(data.likes);
       setIsLiked(data.liked);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoadingLike(false);
     }
   };
 
@@ -338,35 +344,35 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         {/* Icône Play/Pause au centre */}
         {showControlIcon && (
           <div className="video-status-icon">
-            {showControlIcon === 'play'
-              ? <i className="fa fa-play" />
-              : <i className="fa fa-pause" />
-            }
+            {showControlIcon === 'play' ? <i className="fa fa-play" /> : <i className="fa fa-pause" />}
           </div>
         )}
 
         {/* Icônes d'actions (Groupe, Like, Comment, Share, Cart, Fav, More) */}
         <div className="video-card__actions">
-          <div 
-              className={`action-container profile-container ${video.group_slug ? 'clickable' : ''}`} 
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('Clicked on profile icon. video.group_slug:', video.group_slug);
-                if (video.group_slug) {
-                  window.open(`https://exhib1t.com/groups/${video.group_slug}`, '_blank');
-                }
-              }}
-            >
-              <div className="profile-link">
-                <img 
-                  src={video.group_avatar_url || defaultProfile} 
-                  alt={video.group_slug ? "Groupe" : "Profil"} 
-                  className="profile-icon" 
-                />
-              </div>
+          <div
+            className={`action-container profile-container ${video.group_slug ? 'clickable' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (video.group_slug) {
+                window.open(`https://exhib1t.com/groups/${video.group_slug}`, '_blank');
+              }
+            }}
+          >
+            <div className="profile-link">
+              <img
+                src={video.group_avatar_url || defaultProfile}
+                alt={video.group_slug ? "Groupe" : "Profil"}
+                className="profile-icon"
+              />
             </div>
+          </div>
           <div className="action-container" onClick={toggleLike}>
-            <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
+            {loadingLike ? (
+              <i className="fa fa-spinner fa-spin action-btn"></i>
+            ) : (
+              <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
+            )}
             <span className="counter">{likes}</span>
           </div>
           <div className="action-container" onClick={toggleComments}>
@@ -377,7 +383,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <i className="fa fa-share action-btn"></i>
             <span className="counter">{shares}</span>
           </div>
-          
           <div className="action-container" onClick={handleCartClick}>
             <i className="fa fa-ticket action-btn"></i>
             <span className="counter">Billet</span>
@@ -392,24 +397,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           </div>
         </div>
 
-        {/* Nouvelle overlay pour afficher titre et description */}
+        {/* Overlay for title and description */}
         {(video.title || video.description) && (
           <div className="video-overlay">
-            {video.title && (
-              <div className="video-title-overlay">
-                {video.title}
-              </div>
-            )}
-            {video.description && (
-              <div className="video-description-overlay">
-                {video.description}
-              </div>
-            )}
+            {video.title && <div className="video-title-overlay">{video.title}</div>}
+            {video.description && <div className="video-description-overlay">{video.description}</div>}
           </div>
         )}
       </div>
 
-      {/* Sidebar de commentaires */}
+      {/* Comment sidebar */}
       {isCommentOpen && (
         <div className="comment-modal" onClick={() => setIsCommentOpen(false)}>
           <div className="comment-container" onClick={(e) => e.stopPropagation()}>
@@ -417,18 +414,22 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
               <h2>Comments</h2>
               <button className="close-btn" onClick={handleCloseComments}>✕</button>
             </div>
-            <div className="comment-list">
-              {commentsList.length === 0 ? (
-                <p>🚀 Aucun commentaire pour le moment. Soyez le premier!</p>
-              ) : (
-                commentsList.map((comment) => (
-                  <div key={comment.id} style={{ marginBottom: '1rem' }}>
-                    <strong>{comment.user}</strong>
-                    <p>{comment.text}</p>
-                  </div>
-                ))
-              )}
-            </div>
+            {loadingComments ? (
+              <div className="loading">Loading comments...</div>
+            ) : (
+              <div className="comment-list">
+                {commentsList.length === 0 ? (
+                  <p>🚀 Aucun commentaire pour le moment. Soyez le premier!</p>
+                ) : (
+                  commentsList.map((comment) => (
+                    <div key={comment.id} style={{ marginBottom: '1rem' }}>
+                      <strong>{comment.user}</strong>
+                      <p>{comment.text}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
             <div className="comment-input">
               <input
                 type="text"
@@ -442,7 +443,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       )}
 
-      {/* Modale de partage */}
+      {/* Share modal */}
       {isShareOpen && (
         <div className="share-modal" onClick={() => setIsShareOpen(false)}>
           <div className="share-container" onClick={(e) => e.stopPropagation()}>
@@ -464,7 +465,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       )}
 
-      {/* Modale du panier */}
+      {/* Cart modal */}
       {isCartModalOpen && (
         <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
@@ -475,7 +476,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       )}
 
-      {/* Modale More options */}
+      {/* More options modal */}
       {isMoreMenuOpen && (
         <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
           <div className="cart-container" onClick={(e) => e.stopPropagation()}>
@@ -483,16 +484,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <button className="more-option">
               <i className="fa fa-flag"></i> Report
             </button>
-            <button 
-              className="more-option delete-option"
-              onClick={handleDeleteVideo}
-            >
+            <button className="more-option delete-option" onClick={handleDeleteVideo}>
               <i className="fa fa-trash"></i> Delete Video
             </button>
-            <button 
-              className="close-btn" 
-              onClick={() => setIsMoreMenuOpen(false)}
-            >
+            <button className="close-btn" onClick={() => setIsMoreMenuOpen(false)}>
               ✕ Close
             </button>
           </div>
