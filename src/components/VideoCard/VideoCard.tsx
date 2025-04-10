@@ -359,7 +359,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             >
               <div className="profile-link">
                 <img 
-                  src={defaultProfile} 
+                  src={video.group_avatar_url || defaultProfile} 
                   alt={video.group_slug ? "Groupe" : "Profil"} 
                   className="profile-icon" 
                 />
