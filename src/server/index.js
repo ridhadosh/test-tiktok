@@ -11,7 +11,10 @@ const fs = require('fs');
 const mysql = require('mysql2');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://exhib1t.com/final-version-carrousel/',  
+  credentials: true                // Allow cookies/credentials
+}));
 app.use(express.json());
 
 // Connexion MySQL (vers la base WordPress)
