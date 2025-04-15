@@ -5,6 +5,7 @@ import { VideoData } from '../../types';
 
 // Variable globale pour désactiver les commentaires sur toutes les vidéos
 let globalCommentsDisabled = false;
+declare const tiktokRest: { nonce: string };
 
 interface VideoCardProps {
   video: VideoData;
@@ -273,11 +274,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const handleSendComment = async () => {
     if (!commentText.trim()) return;
     try {
+      const nonce = (window.parent as any).tiktokRest?.nonce || '';
       const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': nonce
+        },
         credentials: 'include',
-        body: JSON.stringify({ user: 'Anonymous', text: commentText }),
+        body: JSON.stringify({ text: commentText }),
       });
       if (!res.ok) throw new Error('Failed to post comment');
       const newComment = await res.json();
@@ -287,6 +292,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
       console.error(err);
     }
   };
+  
 
   /* ------------------------------------------------------------------
      -- PARTAGE --
