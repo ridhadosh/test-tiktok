@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './VideoCard.css';
 import defaultProfile from '../assets/default-avatar.png';
 import { VideoData } from '../../types';
@@ -12,6 +13,7 @@ interface VideoCardProps {
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
+  const location = useLocation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
@@ -348,19 +350,25 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     <div ref={containerRef} className="video-card">
       <div className="video-wrapper">
         {/* ─── NAV FLUX / FAVORIS ─── */}
-        <div className="video-card__nav" onClick={e => e.stopPropagation()}>
-          <button
-            className="tab tab--active"
-            onClick={goToFlux}
+                <div className="video-card__nav">
+          {/*
+            Use <Link> so React Router handles it (no full page reload),
+            and stopPropagation so the click doesn’t hit the video.
+          */}
+        <Link
+            to="/"
+          className={`tab ${location.pathname === '/' ? 'tab--active' : ''}`}
+          onClick={e => e.stopPropagation()}
           >
             Flux
-          </button>
-          <button
-            className="tab"
-            onClick={goToFavorites}
-          >
+          </Link>
+        <Link
+            to="/favorites"
+            className={`tab ${location.pathname === '/favorites' ? 'tab--active' : ''}`}
+          onClick={e => e.stopPropagation()}
+        >
             Favoris
-          </button>
+        </Link>
         </div>
 
         <video
