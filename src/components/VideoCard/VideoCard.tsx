@@ -145,23 +145,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   /* ------------------------------------------------------------------
      3) Intersection Observer pour auto‐ouvrir/fermer la sidebar
   ------------------------------------------------------------------ */
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        if (!globalCommentsDisabled && !manualOverride && !isCommentOpen) {
-          setIsCommentOpen(true);
-          fetchComments();
-        }
-      } else {
-        setIsCommentOpen(false);
-        setManualOverride(false);
-      }
-    }, { threshold: 0.7 });
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => {
-      if (containerRef.current) observer.unobserve(containerRef.current);
-    };
-  }, [manualOverride, isCommentOpen, video.id]);
+ 
 
   /* ------------------------------------------------------------------
      4) Intersection Observer pour jouer/pauser la vidéo auto
