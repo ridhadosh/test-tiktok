@@ -21,13 +21,13 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Section milieu : Bouton "Mes Favoris" (seulement sur la home) */}
-      <div className="navbar__center">
+      {/* <div className="navbar__center">
         {isHomePage && (
           <Link to="/favorites" className="publish-button">
             Mes Favoris
           </Link>
         )}
-      </div>
+      </div> */}
 
       {/* Section droite : Bouton "Publier" (sauf sur la page /favorites) */}
       <div className="navbar__actions">

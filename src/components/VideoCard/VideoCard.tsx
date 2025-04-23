@@ -40,14 +40,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Navigation Flux / Favoris
-  const goToFlux = (e: React.MouseEvent) => {
-    window.location.href = '/';
-  };
-  const goToFavorites = (e: React.MouseEvent) => {
-    window.location.href = '/favorites';
-  };
-
   /* ------------------------------------------------------------------
      NEW FUNCTION: Delete video (admin only)
   ------------------------------------------------------------------ */
@@ -406,7 +398,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <span className="counter">{shares}</span>
           </div>
           <div className="action-container" onClick={handleCartClick}>
-            <i className="fa fa-ticket action-btn"></i>
+            <i className="fa fa-shopping-cart action-btn"></i>
             <span className="counter">Billet</span>
           </div>
           <div className="action-container" onClick={toggleFavorite}>
