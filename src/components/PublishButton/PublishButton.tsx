@@ -1,3 +1,4 @@
+// src/components/PublishButton/PublishButton.tsx
 import React, { useState, useEffect } from 'react';
 import './PublishButton.css';
 
@@ -12,67 +13,69 @@ interface PublishButtonProps {
 }
 
 const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
+  // ─── Tous les hooks déclarés en haut ───────────────────────────────────
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const [showModal, setShowModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewURL, setPreviewURL] = useState<string | null>(null);
 
-  // Champs existants
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ticketLink, setTicketLink] = useState('');
 
-  // Nouveaux états pour la gestion des groupes
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<string>('');
 
+  // ─── Effet : quiami-alt pour récupérer roles ─────────────────────────
+  useEffect(() => {
+    fetch('https://exhib1t.com/wp-json/tiktok/v1/whoami-alt', {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(user => {
+        if (Array.isArray(user.roles) && user.roles.includes('administrator')) {
+          setIsAdmin(true);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  // ─── Effet : nettoyage de l’URL preview ───────────────────────────────
   useEffect(() => {
     return () => {
-      if (previewURL) {
-        URL.revokeObjectURL(previewURL);
-      }
+      if (previewURL) URL.revokeObjectURL(previewURL);
     };
   }, [previewURL]);
 
-  // Récupération des groupes via l'endpoint REST
+  // ─── Effet : récupération des groupes ────────────────────────────────
   useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/groups');
-        if (response.ok) {
-          const data = await response.json();
-          setGroups(data);
-        } else {
-          console.error("Erreur lors de la récupération des groupes");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchGroups();
+    fetch('https://exhib1t.com/wp-json/tiktok/v1/groups', {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(data => setGroups(data))
+      .catch(err => console.error('Erreur fetch groups:', err));
   }, []);
 
-  const handlePublish = () => {
-    setShowModal(true);
-  };
+  // ─── Handlers ────────────────────────────────────────────────────────
+  const handlePublish = () => setShowModal(true);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      if (previewURL) {
-        URL.revokeObjectURL(previewURL);
-      }
-      setPreviewURL(URL.createObjectURL(file));
-    }
+    if (!e.target.files?.length) return;
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    if (previewURL) URL.revokeObjectURL(previewURL);
+    setPreviewURL(URL.createObjectURL(file));
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      alert('Veuillez sélectionner une vidéo!');
+      alert('Veuillez sélectionner une vidéo !');
       return;
     }
     if (!selectedGroup) {
-      alert('Veuillez sélectionner un groupe!');
+      alert('Veuillez sélectionner un groupe !');
       return;
     }
 
@@ -86,14 +89,13 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
     try {
       const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
       if (!response.ok) throw new Error('Upload failed');
+      await response.json();
 
-      const data = await response.json();
-      console.log('Upload success:', data);
-
-      // Réinitialisation et fermeture de la modale
+      // reset + callback
       setShowModal(false);
       setSelectedFile(null);
       setPreviewURL(null);
@@ -101,16 +103,20 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       setDescription('');
       setTicketLink('');
       setSelectedGroup('');
-
       onUploadSuccess();
       window.location.reload();
-
-    } catch (error) {
-      console.error(error);
-      alert('Erreur lors de l\'upload!');
+    } catch (err) {
+      console.error('Erreur upload:', err);
+      alert('Erreur lors de l’upload !');
     }
   };
 
+  // ─── Si pas admin, on renvoie juste null ──────────────────────────────
+  if (!isAdmin) {
+    return null;
+  }
+
+  // ─── JSX ─────────────────────────────────────────────────────────────
   return (
     <>
       <button className="publish-button" onClick={handlePublish}>
@@ -137,71 +143,65 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
               {selectedFile && <span className="file-name">{selectedFile.name}</span>}
             </div>
 
-            {/* Preview vidéo */}
+            {/* Aperçu */}
             {previewURL && (
-              <video
-                src={previewURL}
-                className="preview-video"
-                controls
-                width="100%"
-                style={{ marginTop: '1rem' }}
-              />
+              <video src={previewURL} controls className="preview-video" width="100%" />
             )}
 
             {/* Titre */}
-            <div className="title-wrapper" style={{ marginTop: '1rem' }}>
+            <div className="title-wrapper">
               <label htmlFor="videoTitle">Titre :</label>
               <textarea
                 id="videoTitle"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Entrez le titre de la vidéo"
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Entrez le titre"
                 className="video-title-input"
               />
             </div>
 
             {/* Description */}
-            <div className="description-wrapper" style={{ marginTop: '1rem' }}>
-              <label htmlFor="videoDescription">Description (facultatif) :</label>
+            <div className="description-wrapper">
+              <label htmlFor="videoDescription">Description :</label>
               <textarea
                 id="videoDescription"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ajoutez une description à votre vidéo"
+                onChange={e => setDescription(e.target.value)}
+                placeholder="Ajoutez une description (facultatif)"
               />
             </div>
-            
-            {/* Lien du billet */}
-            <div className="ticket-link-wrapper" style={{ marginTop: '1rem' }}>
-              <label htmlFor="ticketLink">Lien du billet (facultatif) :</label>
+
+            {/* Lien billet */}
+            <div className="ticket-link-wrapper">
+              <label htmlFor="ticketLink">Lien billet :</label>
               <input
                 id="ticketLink"
                 type="text"
                 value={ticketLink}
-                onChange={(e) => setTicketLink(e.target.value)}
-                placeholder="Ajoutez un lien vers le billet"
+                onChange={e => setTicketLink(e.target.value)}
+                placeholder="Lien (facultatif)"
                 className="ticket-link-input"
               />
             </div>
 
             {/* Sélection du groupe */}
             <div className="group-selector-wrapper">
-              <label htmlFor="groupSelect">Sélectionnez un groupe :</label>
+              <label htmlFor="groupSelect">Groupe :</label>
               <select
                 id="groupSelect"
                 value={selectedGroup}
-                onChange={(e) => setSelectedGroup(e.target.value)}
+                onChange={e => setSelectedGroup(e.target.value)}
               >
                 <option value="">Choisissez un groupe</option>
-                {groups.map((group) => (
-                  <option key={group.id} value={group.id}>
-                    {group.name}
+                {groups.map(g => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
                   </option>
                 ))}
               </select>
             </div>
 
-
+            {/* Boutons Annuler / Upload */}
             <div className="button-row">
               <button className="cancel-btn" onClick={() => setShowModal(false)}>
                 Annuler
