@@ -39,28 +39,46 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   // NEW STATES: For More menu (and admin status, if needed)
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    fetch('https://exhib1t.com/wp-json/tiktok/v1/whoami-alt', {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(user => {
+        if (Array.isArray(user.roles) && user.roles.includes('administrator')) {
+          setIsAdmin(true);
+        }
+      })
+      .catch(console.error);
+  }, []);
+  
 
   /* ------------------------------------------------------------------
      NEW FUNCTION: Delete video (admin only)
   ------------------------------------------------------------------ */
   const handleDeleteVideo = async () => {
-    if (!window.confirm('Are you sure you want to delete this video permanently?')) {
-      return;
-    }
+    if (!window.confirm('Are you sure you want to delete this video permanently?')) return;
+  
     try {
-      const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/delete-video`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: video.id }),
-      });
-      if (!response.ok) throw new Error('Failed to delete video');
+      const res = await fetch(
+        `https://exhib1t.com/wp-json/tiktok/v1/videos/${video.id}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'X-WP-Nonce': (window as any).tiktokRest.nonce,
+          },
+        }
+      );
+      if (!res.ok) throw new Error(await res.text());
       alert('Video deleted successfully');
       window.location.reload();
-    } catch (error) {
-      console.error('Error deleting video:', error);
+    } catch (err) {
+      console.error(err);
       alert('Failed to delete video. You may not have permission.');
     }
   };
+  
 
   const handleCartClick = () => {
     if (video.ticketLink) {
@@ -498,9 +516,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <button className="more-option">
               <i className="fa fa-flag"></i> Report
             </button>
-            <button className="more-option delete-option" onClick={handleDeleteVideo}>
-              <i className="fa fa-trash"></i> Delete Video
-            </button>
+                  {isAdmin && (
+             <button className="more-option delete-option" onClick={handleDeleteVideo}>
+               <i className="fa fa-trash"></i> Delete Video
+             </button>
+           )}
             <button className="close-btn" onClick={() => setIsMoreMenuOpen(false)}>
               ✕ Close
             </button>
