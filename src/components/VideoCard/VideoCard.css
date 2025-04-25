@@ -621,3 +621,15 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* account for iOS bottom bar */
+.video-card {
+  height: calc(100vh - env(safe-area-inset-bottom));
+}
+
+/* on phones/tablets: shrink the wrapper so nothing is hidden */
+@media (max-width: 768px) {
+  .video-wrapper {
+    height: 75vh;  /* tweak this value up/down until it looks right */
+  }
+}
