@@ -293,7 +293,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
           ref={videoRef}
           src={video.src}
           loop
-          muted
           playsInline
           webkit-playsinline="true"
           x5-playsinline="true"
