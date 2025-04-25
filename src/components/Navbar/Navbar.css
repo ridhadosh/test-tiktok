@@ -10,27 +10,9 @@
   padding: 1rem;
   background: #fff;
   border-bottom: 1px solid #eee;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  padding: 0 1rem;
+  background: #fff;
 }
-  .navbar__logo h1 {
-    font-size: 1.5rem;
-    margin: 0;
-  }
-  
-  .navbar__actions {
-    display: flex;
-    align-items: center;
-  }
-
-  .navbar__title {
-    text-decoration: none;
-    color: #000;  
-    font-size: 1.5rem;
-    font-weight: bold;
-    transition: color 0.2s;
-  }
-  
-  .navbar__title:hover {
-    color: #fe2c55; 
-  }
-  
-  

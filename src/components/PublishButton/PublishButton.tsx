@@ -120,13 +120,13 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   return (
     <>
       <button className="publish-button" onClick={handlePublish}>
-        Publier
+        Ajouter Vidéo
       </button>
 
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-card">
-            <h2>Publier une vidéo</h2>
+            <h2>Ajouter Une Vidéo</h2>
 
             {/* Sélection de fichier */}
             <div className="file-input-wrapper">

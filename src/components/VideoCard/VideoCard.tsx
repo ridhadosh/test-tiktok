@@ -343,6 +343,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   return (
     <div ref={containerRef} className="video-card">
       <div className="video-wrapper">
+        {/* invisible catcher so taps never hit the <video> */}
+      <div
+        className="video-disabled-overlay"
+        onClick={e => e.preventDefault()}
+    />
         {/* ─── NAV FLUX / FAVORIS ─── */}
                 <div className="video-card__nav">
           {/*
@@ -370,7 +375,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           src={video.src}
           className="video-card__player"
           loop
-          onClick={handleVideoPress}
+          muted
+          playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          controls={false}
+          onClick={e => e.preventDefault()}
         />
 
         {/* Icône Play/Pause au centre */}
