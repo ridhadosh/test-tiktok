@@ -292,13 +292,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
         <video
           ref={videoRef}
           src={video.src}
-          className="video-card__player"
           loop
           muted
           playsInline
+          webkit-playsinline="true"
+          x5-playsinline="true"
           controls={false}
           onClick={handleVideoPress}
+          className="video-card__player"
         />
+
         {showControlIcon && (
           <div className="video-status-icon">
             {showControlIcon === 'play' ? <i className="fa fa-play" /> : <i className="fa fa-pause" />}
