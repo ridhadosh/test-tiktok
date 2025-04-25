@@ -8,8 +8,8 @@ import { VideoData } from '../../types';
 let globalCommentsDisabled = false;
 
 interface VideoCardProps {
-  video: VideoData & { userLiked: boolean };
-  isAdmin: boolean;
+  video: VideoData;
+  isAdmin?: boolean;
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
