@@ -4,91 +4,44 @@ import './VideoCard.css';
 import defaultProfile from '../assets/default-avatar.png';
 import { VideoData } from '../../types';
 
-// Variable globale pour désactiver les commentaires sur toutes les vidéos
+// pour désactiver globalement les commentaires
 let globalCommentsDisabled = false;
-declare const tiktokRest: { nonce: string };
 
 interface VideoCardProps {
-  video: VideoData;
+  video: VideoData & { userLiked: boolean };
+  isAdmin: boolean;
 }
 
-const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   const location = useLocation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // État de lecture de la vidéo
+  // ─── Lecture / pause ───────────────────────────────────────────────
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
-  // Compteurs et like
+  // ─── Like / partages ────────────────────────────────────────────────
   const [likes, setLikes] = useState(video.likes || 0);
-  const [shares, setShares] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(video.userLiked);
   const [loadingLike, setLoadingLike] = useState(false);
+  const [shares, setShares] = useState(0);
 
-  // Commentaires
+  // ─── Commentaires ─────────────────────────────────────────────────
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [commentText, setCommentText] = useState('');
   const [commentsCount, setCommentsCount] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [manualOverride, setManualOverride] = useState(false);
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
 
-  // NEW STATES: For More menu (and admin status, if needed)
+  // ─── Billetterie ──────────────────────────────────────────────────
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+
+  // ─── More menu ────────────────────────────────────────────────────
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  useEffect(() => {
-    fetch('https://exhib1t.com/wp-json/tiktok/v1/whoami-alt', {
-      credentials: 'include',
-    })
-      .then(res => res.json())
-      .then(user => {
-        if (Array.isArray(user.roles) && user.roles.includes('administrator')) {
-          setIsAdmin(true);
-        }
-      })
-      .catch(console.error);
-  }, []);
-  
 
-  /* ------------------------------------------------------------------
-     NEW FUNCTION: Delete video (admin only)
-  ------------------------------------------------------------------ */
-  const handleDeleteVideo = async () => {
-    if (!window.confirm('Are you sure you want to delete this video permanently?')) return;
-  
-    try {
-      const res = await fetch(
-        `https://exhib1t.com/wp-json/tiktok/v1/videos/${video.id}`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: {
-            'X-WP-Nonce': (window as any).tiktokRest.nonce,
-          },
-        }
-      );
-      if (!res.ok) throw new Error(await res.text());
-      alert('Video deleted successfully');
-      window.location.reload();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete video. You may not have permission.');
-    }
-  };
-  
-
-  const handleCartClick = () => {
-    if (video.ticketLink) {
-      window.open(video.ticketLink, '_blank');
-    } else {
-      setIsCartModalOpen(true);
-    }
-  };
-
-  // État pour la fenêtre de partage
+  // ─── Partage ──────────────────────────────────────────────────────
   const [isShareOpen, setIsShareOpen] = useState(false);
   const shareLink = video.src;
   const shareOptions = [
@@ -104,16 +57,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     { name: 'Pinterest', icon: 'fa fa-pinterest', link: 'https://pinterest.com' },
   ];
 
-  // Favoris
+  // ─── Favoris ───────────────────────────────────────────────────────
   const [isFavorited, setIsFavorited] = useState(false);
 
   /* ------------------------------------------------------------------
      1) Charger les commentaires pour cette vidéo
   ------------------------------------------------------------------ */
   const fetchComments = async () => {
+    if (globalCommentsDisabled) return;
     setLoadingComments(true);
     try {
-      const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`);
+      const res = await fetch(
+        `https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`
+      );
       if (!res.ok) throw new Error('Failed to fetch comments');
       const data = await res.json();
       setCommentsList(data);
@@ -124,27 +80,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
     }
   };
 
-  useEffect(() => {
-    async function fetchLikeStatus() {
-      setLoadingLike(true);
-      try {
-        const response = await fetch(
-          `https://exhib1t.com/wp-json/tiktok/v1/like/status?videoId=${video.id}`,
-          { credentials: 'include' }
-        );
-        if (!response.ok) throw new Error('Network error');
-        const data = await response.json();
-        // Expecting backend to return { liked: true/false }
-        setIsLiked(data.liked);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingLike(false);
-      }
-    }
-    fetchLikeStatus();
-  }, [video.id]);
-
   /* ------------------------------------------------------------------
      2) Mettre à jour le nombre de commentaires quand la liste change
   ------------------------------------------------------------------ */
@@ -153,38 +88,34 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   }, [commentsList]);
 
   /* ------------------------------------------------------------------
-     3) Intersection Observer pour auto‐ouvrir/fermer la sidebar
-  ------------------------------------------------------------------ */
- 
-
-  /* ------------------------------------------------------------------
-     4) Intersection Observer pour jouer/pauser la vidéo auto
+     3) Intersection Observer pour auto‐play/pause
   ------------------------------------------------------------------ */
   useEffect(() => {
     if (!videoRef.current) return;
-    const playObserver = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        videoRef.current?.play().catch(() => {});
-        setIsPlaying(true);
-      } else {
-        videoRef.current?.pause();
-        if (videoRef.current) videoRef.current.currentTime = 0;
-        setIsPlaying(false);
-      }
-    }, { threshold: 0.7 });
-    if (videoRef.current) playObserver.observe(videoRef.current);
-    return () => {
-      if (videoRef.current) playObserver.unobserve(videoRef.current);
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoRef.current?.play().catch(() => {});
+          setIsPlaying(true);
+        } else {
+          videoRef.current?.pause();
+          if (videoRef.current) videoRef.current.currentTime = 0;
+          setIsPlaying(false);
+        }
+      },
+      { threshold: 0.7 }
+    );
+    observer.observe(videoRef.current);
+    return () => observer.disconnect();
   }, []);
 
   /* ------------------------------------------------------------------
-     4.5) Détection format vidéo (vertical/horizontal)
+     4) Format vidéo (vertical/horizontal)
   ------------------------------------------------------------------ */
   useEffect(() => {
     if (!videoRef.current) return;
     const videoEl = videoRef.current;
-    function handleMetadata() {
+    const onMeta = () => {
       const { videoWidth, videoHeight } = videoEl;
       if (videoHeight > videoWidth) {
         videoEl.classList.add('vertical-video');
@@ -193,21 +124,18 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         videoEl.classList.add('horizontal-video');
         videoEl.classList.remove('vertical-video');
       }
-    }
-    videoEl.addEventListener('loadedmetadata', handleMetadata);
-    return () => {
-      videoEl.removeEventListener('loadedmetadata', handleMetadata);
     };
+    videoEl.addEventListener('loadedmetadata', onMeta);
+    return () => videoEl.removeEventListener('loadedmetadata', onMeta);
   }, []);
 
   /* ------------------------------------------------------------------
-     5) Lecture/Pause au clic
+     5) Lecture/pause au clic
   ------------------------------------------------------------------ */
   const handleVideoPress = () => {
     if (!videoRef.current) return;
-    const allVideos = document.querySelectorAll('video');
-    allVideos.forEach((vid) => {
-      if (vid !== videoRef.current) vid.pause();
+    document.querySelectorAll('video').forEach(v => {
+      if (v !== videoRef.current) v.pause();
     });
     if (isPlaying) {
       videoRef.current.pause();
@@ -221,25 +149,20 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   };
 
   /* ------------------------------------------------------------------
-     6) Like/Unlike – Mise à jour via l'API pour persister en DB
+     6) Like / Unlike
   ------------------------------------------------------------------ */
   const toggleLike = async () => {
-    // If already liked, do nothing
-    if (isLiked) {
-      return;
-    }
+    if (isLiked) return;
     setLoadingLike(true);
     try {
-      const endpoint = 'https://exhib1t.com/wp-json/tiktok/v1/like';
-      const response = await fetch(endpoint, {
+      const res = await fetch('https://exhib1t.com/wp-json/tiktok/v1/like', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoId: video.id }),
       });
-      if (!response.ok) throw new Error('Failed to update like count');
-      const data = await response.json();
-      // Expect backend to return updated like count and status: { likes: number, liked: true }
+      if (!res.ok) throw new Error('Failed to update like');
+      const data = await res.json();
       setLikes(data.likes);
       setIsLiked(data.liked);
     } catch (err) {
@@ -253,13 +176,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
      7) Ouvrir/fermer manuellement la sidebar Comments
   ------------------------------------------------------------------ */
   const toggleComments = () => {
-    setIsCommentOpen((prev) => {
-      const newState = !prev;
+    setIsCommentOpen(prev => {
+      const next = !prev;
       setManualOverride(true);
-      if (newState) {
-        fetchComments();
-      }
-      return newState;
+      if (next) fetchComments();
+      return next;
     });
   };
 
@@ -278,98 +199,96 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
   const handleSendComment = async () => {
     if (!commentText.trim()) return;
     try {
-      const nonce = (window.parent as any).tiktokRest?.nonce || '';
-      const res = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': nonce
-        },
-        credentials: 'include',
-        body: JSON.stringify({ text: commentText }),
-      });
+      const res = await fetch(
+        `https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: commentText }),
+        }
+      );
       if (!res.ok) throw new Error('Failed to post comment');
-      const newComment = await res.json();
-      setCommentsList((prev) => [...prev, newComment]);
+      const newC = await res.json();
+      setCommentsList(prev => [...prev, newC]);
       setCommentText('');
     } catch (err) {
       console.error(err);
     }
   };
-  
 
   /* ------------------------------------------------------------------
-     -- PARTAGE --
+     Suppression de la vidéo (admin only)
   ------------------------------------------------------------------ */
-  const toggleShareModal = () => {
-    setIsShareOpen(!isShareOpen);
-  };
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareLink);
-    alert('Link copied!');
-    setShares((prev) => prev + 1);
-  };
-
-  const handleClickSocial = (url: string) => {
-    window.open(url, '_blank');
-    setShares((prev) => prev + 1);
-  };
-
-  // --------------------------------------------
-  // -- FAVORIS --
-  // --------------------------------------------
-  useEffect(() => {
-    const storedFavs = localStorage.getItem('favorites');
-    const favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
-    if (favIds.includes(video.id)) {
-      setIsFavorited(true);
+  const handleDeleteVideo = async () => {
+    if (!window.confirm('Supprimer définitivement cette vidéo ?')) return;
+    try {
+      const res = await fetch(
+        `https://exhib1t.com/wp-json/tiktok/v1/videos/${video.id}`,
+        {
+          method: 'DELETE',
+          credentials: 'include',
+        }
+      );
+      if (!res.ok) throw new Error(await res.text());
+      alert('Vidéo supprimée');
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert('Échec de la suppression');
     }
+  };
+
+  /* ------------------------------------------------------------------
+     Billetterie et Favoris
+  ------------------------------------------------------------------ */
+  const handleCartClick = () => {
+    if (video.ticketLink) window.open(video.ticketLink, '_blank');
+    else setIsCartModalOpen(true);
+  };
+
+  useEffect(() => {
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]') as number[];
+    setIsFavorited(favs.includes(video.id));
   }, [video.id]);
 
   const toggleFavorite = () => {
-    const storedFavs = localStorage.getItem('favorites');
-    let favIds: number[] = storedFavs ? JSON.parse(storedFavs) : [];
-    if (favIds.includes(video.id)) {
-      favIds = favIds.filter((id) => id !== video.id);
+    let favs = JSON.parse(localStorage.getItem('favorites') || '[]') as number[];
+    if (favs.includes(video.id)) {
+      favs = favs.filter(id => id !== video.id);
       setIsFavorited(false);
     } else {
-      favIds.push(video.id);
+      favs.push(video.id);
       setIsFavorited(true);
     }
-    localStorage.setItem('favorites', JSON.stringify(favIds));
+    localStorage.setItem('favorites', JSON.stringify(favs));
+  };
+
+  const toggleShareModal = () => setIsShareOpen(open => !open);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    alert('Lien copié !');
+    setShares(s => s + 1);
+  };
+  const handleClickSocial = (url: string) => {
+    window.open(url, '_blank');
+    setShares(s => s + 1);
   };
 
   return (
     <div ref={containerRef} className="video-card">
       <div className="video-wrapper">
-        {/* invisible catcher so taps never hit the <video> */}
-      <div
-        className="video-disabled-overlay"
-        onClick={e => e.preventDefault()}
-    />
-        {/* ─── NAV FLUX / FAVORIS ─── */}
-                <div className="video-card__nav">
-          {/*
-            Use <Link> so React Router handles it (no full page reload),
-            and stopPropagation so the click doesn’t hit the video.
-          */}
-        <Link
-            to="/"
-          className={`tab ${location.pathname === '/' ? 'tab--active' : ''}`}
-          onClick={e => e.stopPropagation()}
-          >
+        {/* Nav Flux / Favoris */}
+        <div className="video-card__nav">
+          <Link to="/" className={`tab ${location.pathname === '/' ? 'tab--active' : ''}`} onClick={e => e.stopPropagation()}>
             Flux
           </Link>
-        <Link
-            to="/favorites"
-            className={`tab ${location.pathname === '/favorites' ? 'tab--active' : ''}`}
-          onClick={e => e.stopPropagation()}
-        >
+          <Link to="/favorites" className={`tab ${location.pathname === '/favorites' ? 'tab--active' : ''}`} onClick={e => e.stopPropagation()}>
             Favoris
-        </Link>
+          </Link>
         </div>
 
+        {/* Vidéo */}
         <video
           ref={videoRef}
           src={video.src}
@@ -377,13 +296,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
           loop
           muted
           playsInline
-          webkit-playsinline="true"
-          x5-playsinline="true"
           controls={false}
-          onClick={e => e.preventDefault()}
+          onClick={handleVideoPress}
         />
-
-        {/* Icône Play/Pause au centre */}
         {showControlIcon && (
           <div className="video-status-icon">
             {showControlIcon === 'play' ? <i className="fa fa-play" /> : <i className="fa fa-pause" />}
@@ -392,29 +307,17 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
 
         {/* Icônes d'actions (Groupe, Like, Comment, Share, Cart, Fav, More) */}
         <div className="video-card__actions">
-          <div
-            className={`action-container profile-container ${video.group_slug ? 'clickable' : ''}`}
-            onClick={(e) => {
+          <div className={`action-container profile-container ${video.group_slug ? 'clickable' : ''}`} onClick={e => {
               e.stopPropagation();
-              if (video.group_slug) {
-                window.open(`https://exhib1t.com/groups/${video.group_slug}`, '_blank');
-              }
-            }}
-          >
-            <div className="profile-link">
-              <img
-                src={video.group_avatar_url || defaultProfile}
-                alt={video.group_slug ? "Groupe" : "Profil"}
-                className="profile-icon"
-              />
-            </div>
+              if (video.group_slug) window.open(`https://exhib1t.com/groups/${video.group_slug}`, '_blank');
+            }}>
+            <img src={video.group_avatar_url || defaultProfile} alt="Groupe" className="profile-icon" />
           </div>
           <div className="action-container" onClick={toggleLike}>
-            {loadingLike ? (
-              <i className="fa fa-spinner fa-spin action-btn"></i>
-            ) : (
-              <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
-            )}
+            {loadingLike
+              ? <i className="fa fa-spinner fa-spin action-btn"></i>
+              : <i className={`fa fa-heart action-btn ${isLiked ? 'liked' : ''}`}></i>
+            }
             <span className="counter">{likes}</span>
           </div>
           <div className="action-container" onClick={toggleComments}>
@@ -433,13 +336,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
             <span className="counter">Fav</span>
           </div>
-          <div className="action-container" onClick={() => setIsMoreMenuOpen(!isMoreMenuOpen)}>
+          <div className="action-container" onClick={() => setIsMoreMenuOpen(o => !o)}>
             <i className="fa fa-ellipsis-h action-btn"></i>
             <span className="counter">More</span>
           </div>
         </div>
 
-        {/* Overlay for title and description */}
+        {/* Titre / description */}
         {(video.title || video.description) && (
           <div className="video-overlay">
             {video.title && <div className="video-title-overlay">{video.title}</div>}
@@ -518,19 +421,18 @@ const VideoCard: React.FC<VideoCardProps> = ({ video }) => {
         </div>
       )}
 
-      {/* More options modal */}
       {isMoreMenuOpen && (
         <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
-          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
+          <div className="cart-container" onClick={e => e.stopPropagation()}>
             <h4>Options</h4>
             <button className="more-option">
               <i className="fa fa-flag"></i> Report
             </button>
-                  {isAdmin && (
-             <button className="more-option delete-option" onClick={handleDeleteVideo}>
-               <i className="fa fa-trash"></i> Delete Video
-             </button>
-           )}
+            {isAdmin && (
+              <button className="more-option delete-option" onClick={handleDeleteVideo}>
+                <i className="fa fa-trash"></i> Delete Video
+              </button>
+            )}
             <button className="close-btn" onClick={() => setIsMoreMenuOpen(false)}>
               ✕ Close
             </button>

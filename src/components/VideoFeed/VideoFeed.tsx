@@ -3,42 +3,68 @@ import VideoCard from '../VideoCard/VideoCard';
 import '../VideoFeed/VideoFeed.css';
 import { VideoData } from '../../types';
 
-const VideoFeed: React.FC = () => {
-  // On stocke la liste des vidéos dans un state
-  const [videos, setVideos] = useState<VideoData[]>([]);
+interface VideoDataWithLike extends VideoData {
+  userLiked: boolean;
+}
 
-  // Fonction pour récupérer la liste des vidéos depuis le back-end
-  const fetchVideos = async () => {
+const VideoFeed: React.FC = () => {
+  const [videos, setVideos] = useState<VideoDataWithLike[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // charge à la fois le statut admin et la liste des vidéos + userLiked
+  const loadFeed = async () => {
     try {
-      const response = await fetch(`https://exhib1t.com/wp-json/tiktok/v1/videos?time=${Date.now()}`, {
-        cache: 'no-store'
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch videos');
-      }
-      const data = await response.json();
+      const [userRes, videosRes] = await Promise.all([
+        fetch('https://exhib1t.com/wp-json/tiktok/v1/whoami-alt', {
+          credentials: 'include',
+        }),
+        fetch(
+          `https://exhib1t.com/wp-json/tiktok/v1/videos?withLiked=true&time=${Date.now()}`,
+          {
+            credentials: 'include',
+            cache: 'no-store',
+          }
+        ),
+      ]);
+
+      if (!userRes.ok) throw new Error('Échec du chargement du user');
+      if (!videosRes.ok) throw new Error('Échec du chargement des vidéos');
+
+      const user = await userRes.json();
+      setIsAdmin(
+        Array.isArray(user.roles) && user.roles.includes('administrator')
+      );
+
+      const data: VideoDataWithLike[] = await videosRes.json();
       setVideos(data);
-    } catch (error) {
-      console.error('Error fetching videos:', error);
+    } catch (err) {
+      console.error('Erreur loadFeed:', err);
     }
   };
 
-  // Appel au montage du composant pour charger les vidéos
   useEffect(() => {
-    fetchVideos();
+    loadFeed();
   }, []);
 
-  // Callback pour rafraîchir la liste après upload (si on place PublishButton ici)
+  // si tu intègres PublishButton ici, tu peux rafraîchir tout le feed
   const handleUploadSuccess = () => {
-    fetchVideos();
+    loadFeed();
   };
 
   return (
     <div className="video-feed">
-      {/* Optionnel : si tu veux le bouton ici, tu l’ajoutes */}
+      {/* 
+        Si tu veux afficher le bouton de publication ici, 
+        décommente la ligne suivante et importe ton PublishButton 
+      */}
       {/* <PublishButton onUploadSuccess={handleUploadSuccess} /> */}
-      {videos.map((video) => (
-        <VideoCard key={video.id} video={video} />
+
+      {videos.map(video => (
+        <VideoCard
+          key={video.id}
+          video={video}
+          isAdmin={isAdmin}
+        />
       ))}
     </div>
   );
