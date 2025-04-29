@@ -334,10 +334,6 @@
 
 /* For smaller screens, let the video still fill the height */
 @media (max-width: 768px) {
-  .video-wrapper {
-    height: 100%;
-    border-radius: 0;
-  }
   
   .video-card__actions {
     bottom: 8vh; /* ⇦ au lieu de 15%, s’adapte mieux à différentes hauteurs */
@@ -698,10 +694,9 @@
 /* on phones/tablets: shrink the wrapper so nothing is hidden */
 @media (max-width: 768px) {
   .video-wrapper {
-    height: 75vh;
-    
-    margin-bottom: 10%;
-    top: 0%;
+    height: 65vh;
+    border-radius: 0px;
+    margin-bottom: 40%;
   }
 }
 
