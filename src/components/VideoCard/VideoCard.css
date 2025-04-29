@@ -661,3 +661,14 @@
     height: 75vh;  /* tweak this value up/down until it looks right */
   }
 }
+
+@media (max-width: 768px) {
+  header.site-header,
+  .bb-header,
+  .bb-mobile-header-wrapper,
+  .navbar,
+  .header,
+  .site-header-container {
+    display: none !important;
+  }
+}
