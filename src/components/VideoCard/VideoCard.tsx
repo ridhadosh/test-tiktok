@@ -101,6 +101,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
           videoRef.current?.pause();
           if (videoRef.current) videoRef.current.currentTime = 0;
           setIsPlaying(false);
+
+          setIsCommentOpen(false);
         }
       },
       { threshold: 0.7 }
