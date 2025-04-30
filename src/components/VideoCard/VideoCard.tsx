@@ -22,8 +22,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   const [showControlIcon, setShowControlIcon] = useState<'play' | 'pause' | null>(null);
 
   // ─── Like / partages ────────────────────────────────────────────────
-  const [likes, setLikes] = useState(video.likes || 0);
   const [isLiked, setIsLiked] = useState(video.userLiked);
+  const [likes , setLikes ] = useState(video.likes);  
   const [loadingLike, setLoadingLike] = useState(false);
   const [shares, setShares] = useState(0);
 
@@ -154,25 +154,37 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
      6) Like / Unlike
   ------------------------------------------------------------------ */
   const toggleLike = async () => {
-    if (isLiked) return;
     setLoadingLike(true);
+  
+    // pick the right route
+    const path = isLiked
+      ? 'https://exhib1t.com/wp-json/tiktok/v1/unlike'
+      : 'https://exhib1t.com/wp-json/tiktok/v1/like';
+  
     try {
-      const res = await fetch('https://exhib1t.com/wp-json/tiktok/v1/like', {
+      const res = await fetch(path, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': window.tiktokRest.nonce,    // ← add this
+        },
         body: JSON.stringify({ videoId: video.id }),
       });
-      if (!res.ok) throw new Error('Failed to update like');
+  
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  
       const data = await res.json();
       setLikes(data.likes);
       setIsLiked(data.liked);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to update like', err);
+      alert('Erreur lors de la mise à jour du like');
     } finally {
       setLoadingLike(false);
     }
   };
+  
 
   /* ------------------------------------------------------------------
      7) Ouvrir/fermer manuellement la sidebar Comments
