@@ -212,23 +212,33 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   ------------------------------------------------------------------ */
   const handleSendComment = async () => {
     if (!commentText.trim()) return;
+    setLoadingComments(true);
+  
     try {
       const res = await fetch(
         `https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`,
         {
           method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': (window as any).tiktokRest.nonce},
+          credentials: 'include',                 // send WP cookies
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': window.tiktokRest.nonce, // send your nonce
+          },
           body: JSON.stringify({ text: commentText }),
         }
       );
-      if (!res.ok) throw new Error('Failed to post comment');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const newC = await res.json();
+      setCommentsList(prev => [...prev, newC]);
       setCommentText('');
-      await fetchComments();
     } catch (err) {
-      console.error(err);
+      console.error('Failed to post comment', err);
+      alert("Échec de l'envoi du commentaire");
+    } finally {
+      setLoadingComments(false);
     }
   };
+  
 
   /* ------------------------------------------------------------------
      Suppression de la vidéo (admin only)
