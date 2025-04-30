@@ -206,14 +206,13 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
         {
           method: 'POST',
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': (window as any).tiktokRest.nonce},
           body: JSON.stringify({ text: commentText }),
         }
       );
       if (!res.ok) throw new Error('Failed to post comment');
-      const newC = await res.json();
-      setCommentsList(prev => [...prev, newC]);
       setCommentText('');
+      await fetchComments();
     } catch (err) {
       console.error(err);
     }
