@@ -14,33 +14,39 @@ const VideoFeed: React.FC = () => {
   // charge à la fois le statut admin et la liste des vidéos + userLiked
   const loadFeed = async () => {
     try {
-      const [userRes, videosRes] = await Promise.all([
+      const [ userRes, videosRes ] = await Promise.all([
         fetch('https://exhib1t.com/wp-json/tiktok/v1/whoami-alt', {
           credentials: 'include',
-        }),
-        fetch(
-          `https://exhib1t.com/wp-json/tiktok/v1/videos?withLiked=true&time=${Date.now()}`,
-          {
-            credentials: 'include',
-            cache: 'no-store',
+          headers: {
+            'X-WP-Nonce': window.tiktokRest.nonce,
           }
-        ),
+        }),
+        fetch(`https://exhib1t.com/wp-json/tiktok/v1/videos?time=${Date.now()}`, {
+          credentials: 'include',        // ← send WP login cookie
+          cache: 'no-store',
+          headers: {
+            'X-WP-Nonce': window.tiktokRest.nonce,  // ← optional for GET, but safe
+          }
+        }),
       ]);
-
-      if (!userRes.ok) throw new Error('Échec du chargement du user');
+  
+      if (!userRes.ok)   throw new Error('Échec du chargement du user');
       if (!videosRes.ok) throw new Error('Échec du chargement des vidéos');
-
+  
       const user = await userRes.json();
       setIsAdmin(
-        Array.isArray(user.roles) && user.roles.includes('administrator')
+        Array.isArray(user.roles) &&
+        user.roles.includes('administrator')
       );
-
+  
       const data: VideoDataWithLike[] = await videosRes.json();
       setVideos(data);
-    } catch (err) {
+    }
+    catch (err) {
       console.error('Erreur loadFeed:', err);
     }
   };
+  
 
   useEffect(() => {
     loadFeed();

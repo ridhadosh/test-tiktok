@@ -8,5 +8,5 @@ export interface VideoData {
   ticketLink?: string;
   group_slug?: string;
   group_avatar_url?: string;
-  userLiked: boolean; 
+  userLiked?: boolean; 
 }
