@@ -246,7 +246,7 @@
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 75vh;
     background: rgba(0, 0, 0, 0.85); /* semi-transparent overlay */
     z-index: 1000;
     display: flex;
@@ -258,20 +258,44 @@
 
   .comment-container {
     width: 100vw;
-    height: 80vh;
+    /* instead of 80vh, use full viewport minus any iOS safe area */
+    height: calc(
+      100vh 
+      - env(safe-area-inset-top) 
+      - env(safe-area-inset-bottom)
+    );
     background: #fff;
     border-radius: 16px 16px 0 0;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     padding: 1rem;
-    box-sizing: border-box; /* 🛠️ KEY FIX: ensures padding doesn't break layout */
-    margin: 0;              /* remove any accidental shift */
+    box-sizing: border-box;
     animation: slideUp 0.3s ease-out forwards;
   }
-
+  .comment-container .comment-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    /* small right gutter so text doesn’t butt up against the scrollbar */
+    padding-right: 0.5rem;
+  }
   .comment-header h2 {
-    font-size: 18px;
+    position: sticky;
+    top: 0;
+    background: #fff;          /* match the pane background */
+    z-index: 20;               /* above the list */
+    padding: 1rem;             /* preserve your spacing */
+    border-bottom: 1px solid #ddd; /* optional separator */
   }
 
+  .comment-container .comment-input {
+    flex: 0 0 auto;
+    position: sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: #fff; 
+    padding: 0.75rem 0; 
+    z-index: 10;
+  }
   .comment-input input {
     font-size: 14px;
   }

@@ -78,7 +78,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
     }
     return ts.slice(0, 10);
   };
-
   // ─── Favoris ───────────────────────────────────────────────────────
   const [isFavorited, setIsFavorited] = useState(false);
 
@@ -407,7 +406,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
         <div className="comment-modal" onClick={() => setIsCommentOpen(false)}>
           <div className="comment-container" onClick={(e) => e.stopPropagation()}>
             <div className="comment-header">
-              <h2>Comments</h2>
+              <h2>Commentaire</h2>
               <button className="close-btn" onClick={handleCloseComments}>✕</button>
             </div>
             {loadingComments ? (
