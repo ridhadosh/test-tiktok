@@ -63,6 +63,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
     const now = Date.now();
     const diffMs = now - then;
     const diffH = diffMs / 3600000;
+    if (diffMs < 1000 * 60 * 60) {
+      const mins = Math.floor(diffMs / (1000 * 60));
+      return `${mins}m`;
+    }
     if (diffH < 24) {
       const h = Math.floor(diffH);
       return `${h}h`;
