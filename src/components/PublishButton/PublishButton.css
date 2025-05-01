@@ -38,8 +38,9 @@
   border-radius: 12px;
   padding: 2rem;
   width: 600px;
-  max-width: 90%;
-  min-height: 300px;   /* Added min-height */
+  max-height: 80vh; 
+  overflow-y: auto;      /* scroll internally if content overflows */
+  display: block; 
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   animation: fadeInUp 0.3s ease forwards;
 }
@@ -101,10 +102,14 @@
 
 /* Conteneur des boutons en bas de la carte */
 .button-row {
-  display: flex;
-  justify-content: center; /* Center the buttons */
-  gap: 1rem;
-  margin-top: 1.5rem;
+  display: flex;                /* re-enable flex */
+  justify-content: center;      /* center the buttons */
+  gap: 1rem;                    /* space between buttons */
+  position: sticky;             
+  bottom: 0;                    
+  background: #fff;             
+  padding: 1rem 0;              /* vertical padding */
+  z-index: 10;                  
 }
 
 /* Bouton Upload */
@@ -149,7 +154,7 @@
   border-radius: 8px;
   object-fit: contain;
   display: block;  /* Permet d'appliquer margin auto */
-  margin: 0 auto;  /* Centre la vidéo horizontalement */
+  margin: 0 auto 1rem;  /* Centre la vidéo horizontalement */
 }
 
 

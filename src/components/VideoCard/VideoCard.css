@@ -212,10 +212,10 @@
 
 .comment-modal {
   position: fixed;
-  top: 0;
+  top: 6%;
   right: 0;
   width: 23%; /* Adjust width as needed */
-  height: 96%;
+  height: 80%;
   background: #fff;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
   z-index: 1000;
@@ -224,6 +224,20 @@
   padding: 1rem;
   border-radius: 20px;
 }
+
+.comment-modal > .comment-container {
+  flex: 1 1 auto;           /* grow to fill the modal */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;         /* hide any overshoot */
+}
+
+.comment-list > div:not(:last-child) {
+  border-bottom: 1px solid #a3a3a3;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 /* COMMENT MODAL - fixed on the right side (optional) */
 /* === COMMENT MODAL — MOBILE VERSION (FULLSCREEN OVER VIDEO) === */
 @media (max-width: 768px) {
@@ -302,9 +316,10 @@
 }
 
 /* COMMENT LIST */
-.comment-list {
-  flex-grow: 1;
-  padding: 10px 0;
+.comment-container .comment-list {
+  flex: 1 1 auto;           /* let the list take remaining space */
+  overflow-y: auto;         /* scroll if too tall */
+  padding-right: 0.5rem;    /* optional gutter so text doesn’t hit scrollbar */
 }
 
 /* COMMENT INPUT */
