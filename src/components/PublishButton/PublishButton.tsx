@@ -70,32 +70,31 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      alert('Veuillez sélectionner une vidéo !');
-      return;
-    }
-    if (!selectedGroup) {
-      alert('Veuillez sélectionner un groupe !');
-      return;
-    }
-
+    if (!selectedFile) return alert('Veuillez sélectionner une vidéo !');
+    if (!selectedGroup) return alert('Veuillez sélectionner un groupe !');
+  
     const formData = new FormData();
     formData.append('video', selectedFile);
     formData.append('title', title);
     formData.append('description', description);
     formData.append('ticketLink', ticketLink);
     formData.append('groupId', selectedGroup);
-
+  
     try {
-      const response = await fetch('https://exhib1t.com/wp-json/tiktok/v1/upload', {
-        method: 'POST',
-        credentials: 'include',
-        body: formData,
-      });
-      if (!response.ok) throw new Error('Upload failed');
+      const response = await fetch(
+        'https://exhib1t.com/wp-json/tiktok/v1/upload',
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'X-WP-Nonce': window.tiktokRest.nonce,
+          },
+          body: formData,
+        }
+      );
+      if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
       await response.json();
-
-      // reset + callback
+  
       setShowModal(false);
       setSelectedFile(null);
       setPreviewURL(null);
@@ -110,6 +109,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
       alert('Erreur lors de l’upload !');
     }
   };
+  
 
   // ─── Si pas admin, on renvoie juste null ──────────────────────────────
   if (!isAdmin) {
