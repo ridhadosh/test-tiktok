@@ -251,6 +251,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
         {
           method: 'DELETE',
           credentials: 'include',
+          headers: {
+            'X-WP-Nonce': window.tiktokRest.nonce,
+          },
         }
       );
       if (!res.ok) throw new Error(await res.text());
