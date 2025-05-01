@@ -57,6 +57,24 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
     { name: 'Pinterest', icon: 'fa fa-pinterest', link: 'https://pinterest.com' },
   ];
 
+  // formatage relatif/absolu du timestamp
+  const formatTimestamp = (ts: string) => {
+    const then = new Date(ts).getTime();
+    const now = Date.now();
+    const diffMs = now - then;
+    const diffH = diffMs / 3600000;
+    if (diffH < 24) {
+      const h = Math.floor(diffH);
+      return `${h}h`;
+    }
+    const diffD = diffH / 24;
+    if (diffD < 7) {
+      const d = Math.floor(diffD);
+      return `${d}j`;
+    }
+    return ts.slice(0, 10);
+  };
+
   // ─── Favoris ───────────────────────────────────────────────────────
   const [isFavorited, setIsFavorited] = useState(false);
 
@@ -396,8 +414,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
                   <p>🚀 Aucun commentaire pour le moment. Soyez le premier!</p>
                 ) : (
                   commentsList.map((comment) => (
-                    <div key={comment.id} style={{ marginBottom: '1rem' }}>
-                      <strong>{comment.user}</strong>
+                    <div key={comment.id} className="comment-item">
+                      <div className="comment-header-row">
+                        <strong>{comment.user}</strong>
+                        <span className="comment-time">{formatTimestamp(comment.timestamp)}</span>
+                      </div>
                       <p>{comment.text}</p>
                     </div>
                   ))
@@ -407,11 +428,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
             <div className="comment-input">
               <input
                 type="text"
-                placeholder="Write a comment..."
+                placeholder="Laisser un commentaire..."
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
               />
-              <button onClick={handleSendComment}>Send</button>
+              <button onClick={handleSendComment}>Envoyé</button>
             </div>
           </div>
         </div>

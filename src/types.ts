@@ -9,4 +9,5 @@ export interface VideoData {
   group_slug?: string;
   group_avatar_url?: string;
   userLiked?: boolean; 
+  timestamp: string;
 }
