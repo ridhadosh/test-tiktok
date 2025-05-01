@@ -364,10 +364,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
             <i className={`fa fa-star action-btn ${isFavorited ? 'liked' : ''}`}></i>
             <span className="counter">Fav</span>
           </div>
-          <div className="action-container" onClick={() => setIsMoreMenuOpen(o => !o)}>
-            <i className="fa fa-ellipsis-h action-btn"></i>
-            <span className="counter">More</span>
-          </div>
+          {isAdmin && (
+            <div className="action-container" onClick={handleDeleteVideo}>
+              <i className="fa fa-trash action-btn delete-btn"/>
+            </div>
+          )}
         </div>
 
         {/* Titre / description */}
@@ -445,25 +446,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
             <h2>🎟 Billetterie</h2>
             <p>Le lien d'achat des billets n'est pas encore disponible.</p>
             <button className="close-btn" onClick={() => setIsCartModalOpen(false)}>✕</button>
-          </div>
-        </div>
-      )}
-
-      {isMoreMenuOpen && (
-        <div className="more-modal" onClick={() => setIsMoreMenuOpen(false)}>
-          <div className="cart-container" onClick={e => e.stopPropagation()}>
-            <h4>Options</h4>
-            <button className="more-option">
-              <i className="fa fa-flag"></i> Report
-            </button>
-            {isAdmin && (
-              <button className="more-option delete-option" onClick={handleDeleteVideo}>
-                <i className="fa fa-trash"></i> Delete Video
-              </button>
-            )}
-            <button className="close-btn" onClick={() => setIsMoreMenuOpen(false)}>
-              ✕ Close
-            </button>
           </div>
         </div>
       )}
