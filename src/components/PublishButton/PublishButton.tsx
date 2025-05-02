@@ -75,6 +75,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
     if (!selectedFile) return alert('Veuillez sélectionner une vidéo !');
     if (!selectedGroup) return alert('Veuillez sélectionner un groupe !');
     if (!ticketLink) return alert('Veuillez entrer un lien de billet !');
+    if (!title) return alert('Veuillez entrer un titre !');
   
     const formData = new FormData();
     formData.append('video', selectedFile);
@@ -182,7 +183,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
                 type="text"
                 value={ticketLink}
                 onChange={e => setTicketLink(e.target.value)}
-                placeholder="Lien (facultatif)"
+                placeholder="Insérez le lien du billet"
                 className="ticket-link-input"
               />
             </div>
