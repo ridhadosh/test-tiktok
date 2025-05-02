@@ -3,6 +3,7 @@
   position: relative;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   background-color: #ffffff;
   overflow: hidden;
   scroll-snap-align: start;
@@ -16,7 +17,8 @@
   position: relative;
   width: 100%;
   max-width: 600px;
-  height: 80%;
+  height: 80vh;
+  height: 80dvh;
   background-color: #000000;
   border-radius: 16px;
   overflow: hidden;
@@ -238,73 +240,6 @@
   margin-bottom: 0.75rem;
 }
 
-/* COMMENT MODAL - fixed on the right side (optional) */
-/* === COMMENT MODAL — MOBILE VERSION (FULLSCREEN OVER VIDEO) === */
-@media (max-width: 768px) {
-  .comment-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 75vh;
-    background: rgba(0, 0, 0, 0.85); /* semi-transparent overlay */
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    padding: 0;
-    margin: 0;
-  }
-
-  .comment-container {
-    width: 100vw;
-    /* instead of 80vh, use full viewport minus any iOS safe area */
-    height: calc(
-      100vh 
-      - env(safe-area-inset-top) 
-      - env(safe-area-inset-bottom)
-    );
-    background: #fff;
-    border-radius: 16px 16px 0 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 1rem;
-    box-sizing: border-box;
-    animation: slideUp 0.3s ease-out forwards;
-  }
-  .comment-container .comment-list {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    /* small right gutter so text doesn’t butt up against the scrollbar */
-    padding-right: 0.5rem;
-  }
-  .comment-header h2 {
-    position: sticky;
-    top: 0;
-    background: #fff;          /* match the pane background */
-    z-index: 20;               /* above the list */
-    padding: 1rem;             /* preserve your spacing */
-    border-bottom: 1px solid #ddd; /* optional separator */
-  }
-
-  .comment-container .comment-input {
-    flex: 0 0 auto;
-    position: sticky;
-    bottom: env(safe-area-inset-bottom);
-    background: #fff; 
-    padding: 0.75rem 0; 
-    z-index: 10;
-  }
-  .comment-input input {
-    font-size: 14px;
-  }
-
-  .comment-input button {
-    font-size: 14px;
-  }
-}
-
 /* Slide-up animation (mobile) */
 @keyframes slideUp {
   from {
@@ -377,22 +312,6 @@
   border-radius: 5px;
 }
 
-/* For smaller screens, let the video still fill the height */
-@media (max-width: 768px) {
-  
-  .video-card__actions {
-    bottom: 8vh; /* ⇦ au lieu de 15%, s’adapte mieux à différentes hauteurs */
-    right: 10px;
-    gap: 1.3rem;
-  }
-  
-  .action-btn {
-    font-size: 25px;
-  }
-  .counter {
-    font-size: 8px;
-  }
-}
 
 /* ================== SHARE MODAL ================== */
 .share-modal {
@@ -401,6 +320,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: rgba(0,0,0,0.5);
   z-index: 9999;
 
@@ -588,27 +508,6 @@
   max-width: 100%; /* Ensure description doesn't overflow */
   word-break: break-word; /* Break long words if needed */
 }
-@media (max-width: 768px) {
-  .video-overlay {
-    padding-right: 90px; /* Add space for icons */
-  }
-
-  .video-description-overlay {
-    font-size: 0.8rem;
-    line-height: 1.3;
-  }
-
-  .video-title-overlay {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .video-card__nav .tab {
-    font-size: 1rem;
-    padding-bottom: 2px;
-  }
-}
 
 /* Animation d'apparition */
 @keyframes fadeInUp {
@@ -657,6 +556,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: rgba(0,0,0,0.5);
   z-index: 9999;
   display: flex;
@@ -731,21 +631,113 @@
   to { transform: rotate(360deg); }
 }
 
-/* account for iOS bottom bar */
-.video-card {
-  height: calc(100vh - env(safe-area-inset-bottom));
-}
-
-/* on phones/tablets: shrink the wrapper so nothing is hidden */
 @media (max-width: 768px) {
+  /* Video wrapper */
   .video-wrapper {
     height: 65vh;
-    border-radius: 0px;
+    height: 65dvh;
+    border-radius: 0;
     margin-bottom: 40%;
   }
-}
 
-@media (max-width: 768px) {
+  /* Nav tabs */
+  .video-card__nav .tab {
+    font-size: 1rem;
+    padding-bottom: 2px;
+  }
+
+  /* Action icons */
+  .video-card__actions {
+    bottom: 8vh;
+    bottom: 8dvh;
+    right: 10px;
+    gap: 1.3rem;
+  }
+  .action-btn {
+    font-size: 25px;
+  }
+  .counter {
+    font-size: 8px;
+  }
+
+  /* Video text overlay */
+  .video-overlay {
+    padding-right: 90px;
+  }
+  .video-description-overlay {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  .video-title-overlay {
+    font-size: 1rem;
+  }
+
+  /* Fullscreen Comment sheet */
+  .comment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 75vh;
+    height: 75dvh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0;
+    margin: 0;
+  }
+  .comment-container {
+    width: 100vw;
+    height: calc(
+      100vh
+      - env(safe-area-inset-top)
+      - env(safe-area-inset-bottom)
+    );
+    height: calc(
+      100dvh
+      - env(safe-area-inset-top)
+      - env(safe-area-inset-bottom)
+    );
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1rem;
+    box-sizing: border-box;
+    animation: slideUp 0.3s ease-out forwards;
+  }
+  .comment-container .comment-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+  .comment-header h2 {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 20;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+  }
+  .comment-container .comment-input {
+    flex: 0 0 auto;
+    position: sticky;
+    bottom: env(safe-area-inset-bottom);
+    background: #fff;
+    padding: 0.75rem 0;
+    z-index: 10;
+  }
+  .comment-input input {
+    font-size: 14px;
+  }
+  .comment-input button {
+    font-size: 14px;
+  }
+
+  /* Hide WP mobile headers in embed */
   .no-mobile-header-page header.site-header,
   .no-mobile-header-page .bb-mobile-header-wrapper,
   .no-mobile-header-page .bb-mobile-header,
@@ -756,7 +748,6 @@
     visibility: hidden !important;
     overflow: hidden !important;
   }
-
   .no-mobile-header-page {
     margin-top: 0 !important;
     padding-top: 0 !important;
