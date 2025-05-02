@@ -16,4 +16,37 @@
 .video-feed::-webkit-scrollbar {
 display: none; /* Chrome/Safari/WebKit */
 }
+
+/* src/pages/FavoritesPage/FavoritesPage.css */
+
+.favorites-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+}
+
+.favorites-empty__message {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.favorites-empty__back-btn {
+  background-color: #fe2c55;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.favorites-empty__back-btn:hover {
+  background-color: #c91540;
+}
+
   
