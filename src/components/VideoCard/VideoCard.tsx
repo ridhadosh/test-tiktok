@@ -410,7 +410,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
               <button className="close-btn" onClick={handleCloseComments}>✕</button>
             </div>
             {loadingComments ? (
-              <div className="loading">Loading comments...</div>
+              <div className="loading">Chargement des commentaires...</div>
             ) : (
               <div className="comment-list">
                 {commentsList.length === 0 ? (
@@ -459,17 +459,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
               ))}
             </div>
             <button className="close-btn" onClick={() => setIsShareOpen(false)}>✕</button>
-          </div>
-        </div>
-      )}
-
-      {/* Cart modal */}
-      {isCartModalOpen && (
-        <div className="cart-modal" onClick={() => setIsCartModalOpen(false)}>
-          <div className="cart-container" onClick={(e) => e.stopPropagation()}>
-            <h2>🎟 Billetterie</h2>
-            <p>Le lien d'achat des billets n'est pas encore disponible.</p>
-            <button className="close-btn" onClick={() => setIsCartModalOpen(false)}>✕</button>
           </div>
         </div>
       )}

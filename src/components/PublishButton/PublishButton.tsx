@@ -27,6 +27,8 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<string>('');
 
+  const canUpload = !!selectedFile && !!selectedGroup && ticketLink.trim().length > 0;
+
   // ─── Effet : quiami-alt pour récupérer roles ─────────────────────────
   useEffect(() => {
     fetch('https://exhib1t.com/wp-json/tiktok/v1/whoami-alt', {
@@ -72,6 +74,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({ onUploadSuccess }) => {
   const handleUpload = async () => {
     if (!selectedFile) return alert('Veuillez sélectionner une vidéo !');
     if (!selectedGroup) return alert('Veuillez sélectionner un groupe !');
+    if (!ticketLink) return alert('Veuillez entrer un lien de billet !');
   
     const formData = new FormData();
     formData.append('video', selectedFile);
