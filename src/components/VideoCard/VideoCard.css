@@ -2,8 +2,7 @@
 .video-card {
   position: relative;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  height: calc(var(--vh) * 100);
   background-color: #ffffff;
   overflow: hidden;
   scroll-snap-align: start;
@@ -17,8 +16,7 @@
   position: relative;
   width: 100%;
   max-width: 600px;
-  height: 80vh;
-  height: 80dvh;
+  height: calc(var(--vh) * 80);
   background-color: #000000;
   border-radius: 16px;
   overflow: hidden;
@@ -43,7 +41,7 @@
 /* Action icons (stacked vertically on the right, over the video) */
 .video-card__actions {
   position: absolute;
-  bottom: 15%;
+  bottom: calc(var(--vh) * 15);
   right: 20px;
   display: flex;
   flex-direction: column;
@@ -106,7 +104,7 @@
 
 .video-card__player {
   width: 100%;
-  height: 100%;
+  height: calc(var(--vh) * 80);
   object-fit: cover;  /* or contain, depending on orientation */
   position: relative;
   z-index: 1;         /* under the overlay */
@@ -319,8 +317,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  height: calc(var(--vh) * 80);
   background-color: rgba(0,0,0,0.5);
   z-index: 9999;
 
@@ -555,8 +552,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
-  height: 100dvh;
+  height: calc(var(--vh) * 80);
   background-color: rgba(0,0,0,0.5);
   z-index: 9999;
   display: flex;
@@ -634,10 +630,9 @@
 @media (max-width: 768px) {
   /* Video wrapper */
   .video-wrapper {
-    height: 65vh;
-    height: 65dvh;
+    height: calc(var(--vh) * 78);
     border-radius: 0;
-    margin-bottom: 40%;
+    margin-bottom: 5%;
   }
 
   /* Nav tabs */
@@ -648,8 +643,7 @@
 
   /* Action icons */
   .video-card__actions {
-    bottom: 8vh;
-    bottom: 8dvh;
+    bottom: calc(var(--vh) * 8);
     right: 10px;
     gap: 1.3rem;
   }
@@ -678,8 +672,7 @@
     top: 0;
     left: 0;
     width: 100vw;
-    height: 75vh;
-    height: 75dvh;
+    height: calc(var(--vh) * 80);
     background: rgba(0, 0, 0, 0.85);
     z-index: 1000;
     display: flex;
@@ -691,12 +684,7 @@
   .comment-container {
     width: 100vw;
     height: calc(
-      100vh
-      - env(safe-area-inset-top)
-      - env(safe-area-inset-bottom)
-    );
-    height: calc(
-      100dvh
+      var(--vh) * 100
       - env(safe-area-inset-top)
       - env(safe-area-inset-bottom)
     );
@@ -751,5 +739,13 @@
   .no-mobile-header-page {
     margin-top: 0 !important;
     padding-top: 0 !important;
+  }
+}
+
+/* Safari / iOS only */
+@supports (-webkit-overflow-scrolling: touch) {
+  .comment-modal {
+    /* bump it up 20px just in Safari */
+    margin-bottom: 20px;
   }
 }
