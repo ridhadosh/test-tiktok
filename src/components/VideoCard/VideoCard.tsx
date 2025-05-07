@@ -45,16 +45,41 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const shareLink = video.src;
   const shareOptions = [
-    { name: 'Repost', icon: 'fa fa-retweet', link: '#' },
-    { name: 'Send to friends', icon: 'fa fa-paper-plane', link: '#' },
-    { name: 'Embed', icon: 'fa fa-code', link: '#' },
-    { name: 'WhatsApp', icon: 'fa fa-whatsapp', link: 'https://web.whatsapp.com' },
-    { name: 'Facebook', icon: 'fa fa-facebook', link: 'https://facebook.com' },
-    { name: 'X', icon: 'fa fa-twitter', link: 'https://twitter.com' },
-    { name: 'Telegram', icon: 'fa fa-telegram', link: 'https://telegram.org' },
-    { name: 'LinkedIn', icon: 'fa fa-linkedin', link: 'https://linkedin.com' },
-    { name: 'Reddit', icon: 'fa fa-reddit', link: 'https://reddit.com' },
-    { name: 'Pinterest', icon: 'fa fa-pinterest', link: 'https://pinterest.com' },
+    {
+      name: 'WhatsApp',
+      icon: 'fa fa-whatsapp',
+      link: `https://api.whatsapp.com/send?text=${shareLink}`,
+    },
+    {
+      name: 'Facebook',
+      icon: 'fa fa-facebook',
+      link: `https://www.facebook.com/sharer/sharer.php?u=${shareLink}`,
+    },
+    {
+      name: 'X',
+      icon: 'fa fa-twitter',
+      link: `https://twitter.com/intent/tweet?url=${shareLink}`,
+    },
+    {
+      name: 'Telegram',
+      icon: 'fa fa-telegram',
+      link: `https://t.me/share/url?url=${shareLink}`,
+    },
+    {
+      name: 'LinkedIn',
+      icon: 'fa fa-linkedin',
+      link: `https://www.linkedin.com/sharing/share-offsite/?url=${shareLink}`,
+    },
+    {
+      name: 'Reddit',
+      icon: 'fa fa-reddit',
+      link: `https://www.reddit.com/submit?url=${shareLink}`,
+    },
+    {
+      name: 'Pinterest',
+      icon: 'fa fa-pinterest',
+      link: `https://pinterest.com/pin/create/button/?url=${shareLink}`,
+    },
   ];
 
   // formatage relatif/absolu du timestamp
@@ -311,14 +336,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
     localStorage.setItem('favorites', JSON.stringify(favs));
   };
 
-  const toggleShareModal = () => setIsShareOpen(open => !open);
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareLink);
-    alert('Lien copié !');
-    setShares(s => s + 1);
-  };
+  const toggleShareModal = () => setIsShareOpen(o => !o);
   const handleClickSocial = (url: string) => {
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener');
     setShares(s => s + 1);
   };
 
@@ -444,21 +464,32 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
       {/* Share modal */}
       {isShareOpen && (
         <div className="share-modal" onClick={() => setIsShareOpen(false)}>
-          <div className="share-container" onClick={(e) => e.stopPropagation()}>
-            <h2>Share to</h2>
-            <div className="share-link-container">
-              <input type="text" readOnly value={shareLink} className="share-link" />
-              <button className="copy-btn" onClick={handleCopyLink}>Copy</button>
+          <div className="share-container" onClick={e => e.stopPropagation()}>
+            <h2>Partager la vidéo</h2>
+            {/* --- Aperçu (mini‐carrousel) --- */}
+            <div className="share-carousel">
+              <video
+                src={video.src}
+                controls
+                className="share-video-preview"
+              />
             </div>
+            {/* --- Options de partage --- */}
             <div className="share-options-grid">
-              {shareOptions.map((option) => (
-                <div key={option.name} className="share-option" onClick={() => handleClickSocial(option.link)}>
-                  <i className={option.icon}></i>
-                  <span>{option.name}</span>
+              {shareOptions.map(opt => (
+                <div
+                  key={opt.name}
+                  className="share-option"
+                  onClick={() => handleClickSocial(opt.link)}
+                >
+                  <i className={opt.icon}></i>
+                  <span>{opt.name}</span>
                 </div>
               ))}
             </div>
-            <button className="close-btn" onClick={() => setIsShareOpen(false)}>✕</button>
+            <button className="close-btn" onClick={() => setIsShareOpen(false)}>
+              ✕
+            </button>
           </div>
         </div>
       )}
