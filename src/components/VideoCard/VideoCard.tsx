@@ -25,12 +25,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   const [isLiked, setIsLiked] = useState(video.userLiked);
   const [likes , setLikes ] = useState(video.likes);  
   const [loadingLike, setLoadingLike] = useState(false);
-  const [shares, setShares] = useState(0);
+  const [shares, setShares] = useState(video.shares || 0);
 
   // ─── Commentaires ─────────────────────────────────────────────────
   const [commentsList, setCommentsList] = useState<any[]>([]);
   const [commentText, setCommentText] = useState('');
-  const [commentsCount, setCommentsCount] = useState(0);
+  const [commentsCount, setCommentsCount] = useState(video.comment_count || 0);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [manualOverride, setManualOverride] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -106,6 +106,28 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   };
   // ─── Favoris ───────────────────────────────────────────────────────
   const [isFavorited, setIsFavorited] = useState(false);
+
+  const handleShare = async () => {
+    try {
+      const res = await fetch(
+        `https://exhib1t.com/wp-json/tiktok/v1/share`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': window.tiktokRest.nonce,
+          },
+          body: JSON.stringify({ videoId: video.id }),
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setShares(data.shares);
+    } catch (err) {
+      console.error('Failed to record share', err);
+    }
+  };
 
   /* ------------------------------------------------------------------
      1) Charger les commentaires pour cette vidéo
@@ -266,17 +288,23 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
         `https://exhib1t.com/wp-json/tiktok/v1/comments/${video.id}`,
         {
           method: 'POST',
-          credentials: 'include',                 // send WP cookies
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'X-WP-Nonce': window.tiktokRest.nonce, // send your nonce
+            'X-WP-Nonce': window.tiktokRest.nonce,
           },
           body: JSON.stringify({ text: commentText }),
         }
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const newC = await res.json();
-      setCommentsList(prev => [...prev, newC]);
+      // our new API returns { comment: { … }, comment_count: N }
+      const { comment: newComment, comment_count } = await res.json();
+  
+      // append just the new comment
+      setCommentsList(prev => [...prev, newComment]);
+      // update the count without refetching everything
+      setCommentsCount(comment_count);
+      // clear the input
       setCommentText('');
     } catch (err) {
       console.error('Failed to post comment', err);
@@ -336,12 +364,23 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
     }
     localStorage.setItem('favorites', JSON.stringify(favs));
   };
-
+  // 1️⃣ keep the modal‐toggler:
   const toggleShareModal = () => setIsShareOpen(o => !o);
-  const handleClickSocial = (url: string) => {
+
+  // 2️⃣ new share‐and‐count function:
+  const onShareClick = async (url: string) => {
+    try {
+      // this calls your REST endpoint and updates shares
+      await handleShare();
+    } catch (e) {
+      console.error('Failed to record share', e);
+    }
+    // then actually open the network
     window.open(url, '_blank', 'noopener');
-    setShares(s => s + 1);
+    // and close the modal
+    setIsShareOpen(false);
   };
+
 
   return (
     <div ref={containerRef} className="video-card">
@@ -486,17 +525,17 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
     
           {/* Grid des icônes de partage */}
           <div className="share-options-grid">
-            {shareOptions.map(opt => (
-              <div
-                key={opt.name}
-                className="share-option"
-                onClick={() => handleClickSocial(opt.link)}
-              >
-                <i className={opt.icon}></i>
-                <span>{opt.name}</span>
-              </div>
-            ))}
-          </div>
+            {shareOptions.map((opt) => (
+                <div
+                  key={opt.name}
+                  className="share-option"
+                  onClick={() => onShareClick(opt.link)}
+                >
+                  <i className={opt.icon}></i>
+                  <span>{opt.name}</span>
+                </div>
+              ))}
+            </div>
     
           <button className="close-btn" onClick={() => setIsShareOpen(false)}>✕</button>
         </div>

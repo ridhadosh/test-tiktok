@@ -5,6 +5,8 @@ export interface VideoData {
   productLink?: string;     // Optional product link
   description?: string;     // Optional description field
   likes?: number;
+  shares?: number; 
+  comment_count?: number;
   ticketLink?: string;
   group_slug?: string;
   group_avatar_url?: string;
