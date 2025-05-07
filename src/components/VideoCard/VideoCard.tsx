@@ -150,13 +150,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, isAdmin }) => {
   };
 
   /* ------------------------------------------------------------------
-     2) Mettre à jour le nombre de commentaires quand la liste change
-  ------------------------------------------------------------------ */
-  useEffect(() => {
-    setCommentsCount(commentsList.length);
-  }, [commentsList]);
-
-  /* ------------------------------------------------------------------
      3) Intersection Observer pour auto‐play/pause
   ------------------------------------------------------------------ */
   useEffect(() => {
