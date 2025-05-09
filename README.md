@@ -1,4 +1,4 @@
-<h1 align="center">TEST-TIKTOK</h1>
+<h1 align="center">KOTKIT</h1>
 
 <p align="center"><em>Engage, Share, and Create Your Video Experience</em></p>
 
