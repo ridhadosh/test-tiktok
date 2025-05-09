@@ -18,8 +18,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/github/last-commit/ridhadosh/test-tiktok" />
-  <img src="https://img.shields.io/badge/typescript-60.7%25-blue" />
-  <img src="https://img.shields.io/badge/languages-4-brightgreen" />
+  <img src="https://img.shields.io/github/languages/top/ridhadosh/test-tiktok" />
+  <img src="https://img.shields.io/github/languages/count/ridhadosh/test-tiktok" />
 </p>
 
 KotKit is a React-powered video feed plugin for WordPress, inspired by TikTok’s full-screen, vertically-scrolling experience. It lets users:
