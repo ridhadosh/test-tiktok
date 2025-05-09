@@ -2,6 +2,28 @@
 
 <p align="center"><em>Engage, Share, and Create Your Video Experience</em></p>
 
+KotKit is a React-powered video feed plugin for WordPress, inspired by TikTok’s full-screen, vertically-scrolling experience. It lets users:
+
+Browse & Interact
+Play, pause and loop short videos; like, comment and share with one tap
+
+Commenting System
+Fetch, post and display real-time comments with relative timestamps
+
+Favorites & Ticketing
+Mark videos as favorites for later viewing; view or purchase event tickets directly
+
+Admin Controls
+Trusted users can publish new videos (with title, description, group, ticket link) and delete inappropriate content
+
+Rich Sharing
+Share any video page via WhatsApp, Facebook, X (Twitter), Telegram, LinkedIn, Reddit or Pinterest—complete with proper URL routing and metadata so link previews render correctly
+
+Responsive Design
+Fully mobile-friendly UI with swipe-to-scroll, modal overlays for comments, sharing and ticket info
+
+Built as a standalone React app that integrates seamlessly into WordPress via a simple shortcode, this plugin delivers a smooth, immersive “social video” experience right on your site.
+
 <p align="center">
   <img src="https://img.shields.io/github/last-commit/ridhadosh/test-tiktok" />
   <img src="https://img.shields.io/badge/typescript-60.7%25-blue" />
